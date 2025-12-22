@@ -1,0 +1,2212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Shop Delivery Tracker — Denomination Summary</title>
+<style>
+  /* --- CUSTOM THEME: MINIMIZED FONT & COLORFUL (LIGHT MODE) --- */
+  body { 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    padding: 10px; 
+    max-width: 800px; /* slightly smaller max width */
+    margin: auto; 
+    background-color: #f0f8ff; /* AliceBlue background */
+    font-size: 12px; /* Base font size reduced */
+    color: #333; /* Default text color */
+  }
+  
+  h2 { font-size: 18px; text-align: center; color: #8a2be2; /* BlueViolet */ }
+  h3 { font-size: 16px; text-align: center; color: #8a2be2; }
+  
+  tc, tfoot td { text-align: center; color: #ff4500; /* OrangeRed */ font-weight: bold; }
+  
+  label { display:block; margin:5px 0 2px; font-weight: bold; }
+  
+  input, select, button { 
+    width:100%; 
+    padding: 6px; /* Reduced padding */
+    margin-bottom: 8px; 
+    font-size: 14px; /* Reduced font size */
+    box-sizing:border-box; 
+    border: 1px solid #32cd32; /* LimeGreen border */
+    background-color: white; /* Default input background */
+    color: #333;
+  }
+  
+  table { width:100%; border-collapse:collapse; margin-top:10px; display:block; overflow-x:auto; }
+  table, th, td { border:1px solid #32cd32; } /* LimeGreen border */
+  
+  th, td { 
+    padding: 6px; /* Reduced padding */
+    text-align:center ; 
+    font-size: 12px; /* Reduced font size */
+  }
+  
+  /* Alternating row colors for data tables */
+  #dataTable tbody tr:nth-child(even) { background-color: #e6e6fa; /* Lavender */ }
+  #dataTable thead th, #expensesTable thead th, #returnItemsTable thead th { 
+    background-color: #add8e6; /* LightBlue */
+    color: #333;
+    font-weight: bold;
+  }
+
+  .shop-header-content { display:flex; justify-content:space-between; align-items:center; width:100%; }
+  .clickable-shop { 
+    color: #ff1493; /* DeepPink */ 
+    cursor:pointer; 
+    text-decoration:underline; 
+    font-size: 14px; /* Reduced font size */
+    font-weight:bold; 
+  }
+
+  .button-row { display:flex; gap:8px; flex-wrap:wrap; justify-content:space-between; }
+  .button-row button { 
+    flex:1 1 45%; 
+    font-size: 14px; /* Reduced font size */
+    padding: 8px; /* Reduced padding */
+    background-color: #90ee90; /* LightGreen default button */
+    border: 1px solid #3cb371; /* MediumSeaGreen */
+    color: #333;
+  }
+  
+  #addBtn { background-color: #3cb371; color: white; } /* MediumSeaGreen */
+  #clearBtn { background-color: #ff6347; color: white; } /* Tomato */
+  /* New style for import button */
+  #importCsvBtn { flex: 1 1 100%; background-color: #ffc0cb; border-color: #ff69b4; color: #333; margin-top: 8px;} 
+
+
+  .section-header { margin-top:15px; margin-bottom:8px; text-align:center; font-size: 14px; }
+
+  /* New: Navigation Bar Styling */
+  .navbar { display: flex; justify-content: space-around; margin-bottom: 10px; flex-wrap: wrap; gap: 4px; }
+  .navbar button { 
+    flex-basis: 22%; 
+    padding: 6px; 
+    font-size: 12px; /* Reduced font size */
+    border: 1px solid #4682b4; /* SteelBlue */ 
+    background-color: #e0ffff; /* LightCyan */ 
+    cursor: pointer; 
+    color: #333;
+  }
+  .navbar button.active { 
+    background-color: #4682b4; /* SteelBlue */ 
+    color: white; 
+    font-weight: bold; 
+    border-color: #4682b4; 
+  }
+  
+  /* Modal general */
+  .modal { display:none; position:fixed; z-index:50; center :0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.65); /* Darker overlay */ padding-top:60px; }
+  .modal-content { background:#fffaf0; /* FloralWhite */ margin:4% auto; padding:12px; border:3px solid #ff69b4; /* HotPink border */ width:95%; max-width:700px; border-radius:10px; }
+  .close-btn { color:#ff69b4; float:center ; font-size:30px; font-weight:bold; cursor:pointer; } /* Smaller close button, HotPink */
+  .modal-content h3 { font-size: 18px; }
+  .modal-content p, .modal-content label { font-size: 14px; }
+  .modal-buttons { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+  .modal-buttons button { flex:1 1 30%; padding: 8px; font-size: 14px; background-color: #ffc0cb; /* Pink */ }
+
+  /* Denomination table */
+  #denomSummaryTable input[type="number"] { width:90%; padding:4px; font-size: 12px; box-sizing:border-box; }
+  #denomSummaryTable td:first-child { font-weight:bold; }
+  .denom-count { width:70px; }
+
+  /* Expenses expandable */
+  .expander { cursor:pointer; color: #ff1493; text-decoration:underline; }
+  .hidden { display:none; }
+
+  /* --------------------------------- */
+  /* --- DARK MODE STYLES (NEW) --- */
+  /* --------------------------------- */
+  body.dark-mode { 
+    background-color: #1a1a2e; /* Very Dark Blue */
+    color: #e0ffff; /* Light Cyan for text */
+  }
+  
+  .dark-mode h2, .dark-mode h3 { 
+    color: #90ee90; /* LightGreen */ 
+  }
+  
+  .dark-mode tc, .dark-mode tfoot td { 
+    color: #ffa07a; /* LightSalmon */ 
+  }
+  
+  .dark-mode input, .dark-mode select { 
+    border: 1px solid #4682b4; /* SteelBlue border */
+    background-color: #2b3a55; /* Darker input background */
+    color: #e0ffff;
+  }
+  
+  .dark-mode input[type="number"]::-webkit-outer-spin-button,
+  .dark-mode input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+  }
+
+  .dark-mode table, .dark-mode th, .dark-mode td { 
+    border: 1px solid #4682b4; 
+  }
+
+  .dark-mode #dataTable tbody tr:nth-child(even) { 
+    background-color: #2b3a55; /* Darker Blue */
+  }
+  
+  .dark-mode #dataTable thead th, #expensesTable thead th, #returnItemsTable thead th { 
+    background-color: #4682b4; /* SteelBlue header */
+    color: white;
+  }
+  
+  .dark-mode .clickable-shop { 
+    color: #ffc0cb; /* Pink */ 
+  }
+
+  .dark-mode .button-row button, .dark-mode .modal-buttons button { 
+    background-color: #3e5c76; 
+    border: 1px solid #4682b4; 
+    color: #e0ffff;
+  }
+  
+  .dark-mode #addBtn { 
+    background-color: #4682b4; 
+    color: white; 
+  } 
+  .dark-mode #clearBtn { 
+    background-color: #e57373; 
+    color: white; 
+  } 
+  .dark-mode #importCsvBtn { 
+    background-color: #3e5c76; 
+    border-color: #4682b4; 
+    color: #e0ffff;
+  }
+
+  .dark-mode .navbar button { 
+    background-color: #2b3a55; 
+    color: #e0ffff;
+    border-color: #4682b4;
+  }
+  .dark-mode .navbar button.active { 
+    background-color: #90ee90; /* LightGreen for active */ 
+    color: #1a1a2e; /* Dark text for contrast */
+  }
+
+  .dark-mode .modal-content { 
+    background: #1f2c41; /* Very Dark Blue */
+    border: 3px solid #90ee90; /* LightGreen border */
+  }
+  .dark-mode .close-btn { 
+    color: #90ee90; 
+  }
+  
+  .dark-mode #zoom-controls button {
+    background-color: #3e5c76;
+    color: #e0ffff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+    border: 1px solid #4682b4;
+  }
+</style>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+</head>
+<body style="zoom:1; transition:0.3s; font-family:sans-serif;">
+  <div id="zoom-controls">
+   <button onclick="zoomPage(-0.1)">−</button>
+  <button onclick="zoomPage(0.1)">+</button>
+  <button onclick="toggleDarkMode()" id="darkModeToggle" title="Toggle Dark Mode">🌙</button> 
+  </div>
+
+  <script>
+    let zoom = 1;
+    function zoomPage(step) {
+      zoom += step;
+      zoom = Math.min(Math.max(zoom, 0.5), 3);
+      document.body.style.zoom = zoom;
+    }
+  </script>
+
+  <style>
+    #zoom-controls {
+      position: fixed; /* Changed to fixed for persistent location */
+      top: 20px;
+      right: 20px; /* Moved to top right */
+      display: flex; /* Changed to flex for horizontal layout */
+      flex-direction: row; 
+      gap: 15px;
+      z-index: 9999;
+      
+    }
+    #zoom-controls button {
+      width: 40px; /* Adjusted size */
+      height: 40px;
+      border: none;
+      border-radius: 50%;
+      background-color: #007bff;
+      color: white;
+      font-size: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+    }
+    #zoom-controls button:active {
+      transform: scale(0.9);
+      background-color: #0056b3;
+    }
+    /* Specific styling for the new dark mode toggle icon */
+    #darkModeToggle {
+        font-size: 18px;
+        background-color: #90ee90; /* Light green in light mode */
+        color: #1a1a2e;
+    }
+    .dark-mode #darkModeToggle {
+        background-color: #4682b4; /* SteelBlue in dark mode */
+        color: #e0ffff;
+    }
+  </style>
+  </body>
+  <br><br><br><br>
+<h2>Shop Delivery Tracker</h2>
+
+<div class="navbar">
+    <button id="nav-sales" class="active" onclick="changePage('sales')">SKU Sales Entry</button>
+    <button id="nav-shops" onclick="changePage('shops')">Shop Details</button>
+    <button id="nav-denoms" onclick="changePage('denoms')">Denomination</button>
+    <button id="nav-expenses" onclick="changePage('expenses')">Expenses</button>
+    <button id="nav-summary" onclick="changePage('summary')">Summary Report</button> 
+    <button onclick="exportDataToXLSX()" style="background-color: #98fb98; color: #333; font-weight: bold;">Export XLSX</button>
+    <button onclick="viewStorage()">View Storage</button>
+</div>
+
+<div id="page-sales" class="page-content">
+  <form id="dataForm">
+    <label for="shop">Shop Name</label>
+    <input type="text" id="shop" required />
+
+    <label for="category">Category (SKU)</label>
+    <select id="category" required>
+        <option value="" disabled selected>Select SKU or Enter New</option>
+        <option value="NEW_SKU_ENTRY">** Enter New SKU **</option>
+    </select>
+    
+    <input type="text" id="newCategoryInput" style="display:none;" placeholder="Enter new SKU name" />
+
+    <label for="quantity">Quantity</label>
+    <input type="number" id="quantity" step="1" min="1" required />
+
+    <label for="amount">Amount (₹)</label>
+    <input type="number" id="amount" step="0.01" min="0" required />
+
+    <div class="button-row">
+      <button type="submit" id="addBtn"><b><font color="white">Add</font></b></button>
+      <button type="button" id="clearBtn"><font color="white">Clear All</font></button>
+      <button type="button" id="importCsvBtn"><b>Import CSV</b></button>
+      </div>
+  </form>
+  <input type="file" id="csvFileInput" style="display:none;" accept=".csv" />
+  </div>
+
+<div id="page-shops" class="page-content" style="display:none;">
+    <table id="dataTable" aria-label="Shop purchases table">
+      <thead>
+        <tr>
+          <th>Shop</th>
+          <th>Category</th>
+          <th>Quantity</th>
+          <th>Amount (₹)</th>
+          <th>Total per Category (₹)</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+      <tfoot>
+        <tr>
+          <td colspan="2">Totals</td>
+          <td id="totalQuantity"></td>
+          <td id="totalAmount"></td>
+          <td></td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <hr style="margin-top: 30px; border-color: #ccc;">
+
+    <div id="returnItemsSummary">
+      <h3 class="section-header">Undelivered SKUs</h3>
+      <table id="returnItemsTable" aria-label="Return items summary table">
+        <thead><tr><th>SKU (Category)</th><th>Total Quantity</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+</div>
+
+<div id="page-denoms" class="page-content" style="display:none;">
+    <hr style="margin-top: 30px; border-color: #ccc;">
+
+    <div id="paymentCalculator">
+      <h3 class="section-header">Payment & Denomination Summary</h3>
+      <table id="paymentTable">
+        <thead>
+          <tr><th>Description</th><th>Amount (₹)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Total Collection (Delivered Shops Only)</td><td><span id="calcDeliveredCollection"></span></td></tr>
+          <tr><td>Sum of Online Payments (from Delivered shops)</td><td><span id="calcOnlinePaymentSum"></span></td></tr>
+          <tr><td>Cash Amount (from Denomination Summary)</td><td><span id="calcCashAmount"></span></td></tr>
+          <tr><td><tc>Expenses (Total)</tc></td><td><span id="calcExpensesTotal"></span></td></tr>
+        </tbody>
+        <tfoot>
+          <tr><td>Balance </td><td><span id="balanceAmount"></span></td></tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div id="denominationSummary">
+      <h3 class="section-header">Denomination Summary</h3>
+      <p>Counts below are the current cash notes on-hand from deliveries minus cash expenses.</p>
+      <table id="denomSummaryTable" aria-label="Denomination summary">
+        <thead><tr><th>Denomination (₹)</th><th>Count</th><th>Total (₹)</th></tr></thead>
+        <tbody></tbody>
+        <tfoot>
+          <tr><td colspan="2">Cash Amount Total</td><td id="denomCashTotal">0.00</td></tr>
+        </tfoot>
+      </table>
+    </div>
+</div>
+
+
+<script>
+function toggleExpensesPanel(){
+  var panel = document.getElementById('expensesPanel');
+  if(!panel) return;
+  panel.classList.toggle('hidden');
+}
+</script>
+
+<div id="page-expenses" class="page-content" style="display:none;">
+    <hr style="margin-top: 30px; border-color: #ccc;">
+
+    <div>
+      <h3 class="section-header">Expenses <span id="expander" class="expander" onclick="toggleExpensesPanel()">[Toggle]</span></h3>
+      <div id="expensesPanel" class="hidden">
+        <label for="expenseDesc">Expense Description</label>
+        <input type="text" id="expenseDesc" placeholder="e.g., Fuel, Packaging" />
+        <label for="expenseAmount">Amount (₹)</label>
+        <input type="number" id="expenseAmount" step="0.01" min="0" value="" />
+        <label for="expenseType">Type</label>
+        <select id="expenseType">
+          <option value="Cash">Cash</option>
+          <option value="Online">Online</option>
+        </select>
+        <div style="display:flex; gap:10px;">
+          <button id="addExpenseBtn" style="flex:1">Add Expense</button>
+          <button id="clearExpensesBtn" style="flex:1">Clear All Expenses</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 15px;">
+      <table id="expensesTable" aria-label="Expenses summary table">
+        <thead><tr><th>Description</th><th>Amount (₹)</th><th>Type</th><th>Action</th></tr></thead>
+        <tbody></tbody>
+        <tfoot>
+          <tr><td>Total</td><td id="expensesTotal"></td><td></td><td></td></tr>
+        </tfoot>
+      </table>
+    </div>
+</div>
+
+<div id="page-summary" class="page-content" style="display:none;">
+    <h3 class="section-header" style="color:#8a2be2;">OVERALL TRACKER SUMMARY</h3>
+    <div id="summaryContent" style="font-size: 10px; line-height: 1.2;">
+        <p style="text-align:center;">Loading data...</p>
+    </div>
+</div>
+<div id="paymentTypeModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="cancelPaymentConfirmation()">&times;</span>
+    <h3>Confirm Payment for <span id="paymentShopName"></span></h3>
+    <p><h1>Shop Total: <strong id="paymentShopTotal"></strong></h1></p>
+    <p>Please select the payment method:</p>
+    <div class="modal-buttons">
+      <button onclick="confirmPayment('Cash')">Cash Payment</button>
+      <button onclick="confirmPayment('Online')"><b>Online Payment</b></button>
+      <button onclick="openPartialPaymentModal()">Partial Cash/Online Payment</button>
+    </div>
+  </div>
+</div>
+
+<div id="partialPaymentModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closePartialPaymentModal()">&times;</span>
+    <h3>Partial Payment for <span id="partialShopName"></span></h3>
+    <p>Required Total: <strong id="partialRequiredTotal"></strong></p>
+
+    <label for="partialCashAmount">Cash Amount (₹)</label>
+    <input type="number" id="partialCashAmount" step="0.01" min="0" value="" />
+
+    <label for="partialOnlineAmount">Online Amount (₹)</label>
+    <input type="number" id="partialOnlineAmount" step="0.01" min="0" value="" />
+
+    <p>Sum Entered: <span id="partialSumEntered" style="font-weight:bold">0.00</span></p>
+    <p id="partialError" style="color:red;font-weight:bold;display:none">Error: Amounts must total the Required Total.</p>
+
+    <div style="display:flex; gap:10px;">
+      <button onclick="confirmPartialPayment()">Confirm Partial Payment</button>
+      <button onclick="closePartialPaymentModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="denomModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="cancelDenomModal()">&times;</span>
+    <h3 id="denomModalTitle">Enter Denominations</h3>
+    <p id="denomModalNote" style="margin-top:0"></p>
+
+    <table id="denomRequiredSummaryTable" style="width:100%; margin-bottom:12px; border: 2px solid #ccc;">
+        <thead>
+            <tr><th>Description</th><th>Amount (₹)</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Needed (Cash Required)</td><td id="denomNeeded" style="text-align:center ">0.00</td></tr>
+            <tr><td>Received (Denom Count)</td><td id="denomReceived" style="text-align:center ">0.00</td></tr>
+            <tr style="font-weight:bold; color:red;"><td>Remaining Required</td><td id="denomRemaining" style="text-align:center ">0.00</td></tr>
+        </tbody>
+    </table>
+    <table id="denomEntryTable" style="width:100%; margin-top:8px;">
+      <thead><tr><th>Denomination (₹)</th><th>Count</th><th>Total (₹)</th></tr></thead>
+      <tbody></tbody>
+      <tfoot><tr><td colspan="2">Denomination Total</td><td id="denomEntryTotal">0.00</td></tr></tfoot>
+    </table>
+
+    <div style="display:flex; gap:10px; margin-top:12px;">
+      <button id="denomConfirmBtn" style="flex:1">Confirm</button>
+      <button onclick="cancelDenomModal()" style="flex:1">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="customModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal('customModal')">&times;</span>
+    <h3 id="modalShopName"></h3>
+    
+    <div id="modalShopTotalSection">
+        <p>Total Collection: <h1><font color="red"><strong id="modalTotalAmount"></strong></font></h1></p>
+    </div>
+    
+    <div id="modalGenericSection" style="display:none; text-align: left;">
+    </div>
+
+    <button onclick="closeModal('customModal')">OK</button>
+  </div>
+</div>
+
+<script>
+/* ---------- Constants & DOM ---------- */
+const DENOMINATIONS = [2000,500,200,100,50,20,10,5,2,1];
+
+// DOM Elements
+const dataForm = document.getElementById('dataForm');
+const shopInput = document.getElementById('shop');
+const categorySelect = document.getElementById('category'); 
+const newCategoryInput = document.getElementById('newCategoryInput'); 
+const quantityInput = document.getElementById('quantity');
+const amountInput = document.getElementById('amount');
+const dataTableBody = document.querySelector('#dataTable tbody');
+const totalQuantityCell = document.getElementById('totalQuantity');
+const totalAmountCell = document.getElementById('totalAmount');
+
+// NEW CSV IMPORT ELEMENTS
+const csvFileInput = document.getElementById('csvFileInput');
+const importCsvBtn = document.getElementById('importCsvBtn');
+
+const paymentTypeModal = document.getElementById('paymentTypeModal');
+const partialCashAmountInput = document.getElementById('partialCashAmount');
+const partialOnlineAmountInput = document.getElementById('partialOnlineAmount');
+const partialErrorDiv = document.getElementById('partialError');
+
+const denomModal = document.getElementById('denomModal');
+const denomEntryTbody = document.querySelector('#denomEntryTable tbody');
+const denomEntryTotalSpan = document.getElementById('denomEntryTotal');
+const denomModalTitle = document.getElementById('denomModalTitle');
+const denomModalNote = document.getElementById('denomModalNote');
+const denomConfirmBtn = document.getElementById('denomConfirmBtn');
+// Denomination Summary Table Elements
+const denomNeededSpan = document.getElementById('denomNeeded');
+const denomReceivedSpan = document.getElementById('denomReceived');
+const denomRemainingSpan = document.getElementById('denomRemaining');
+
+const denomSummaryTbody = document.querySelector('#denomSummaryTable tbody');
+const denomCashTotal = document.getElementById('denomCashTotal');
+
+const calcDeliveredCollection = document.getElementById('calcDeliveredCollection');
+const calcOnlinePaymentSum = document.getElementById('calcOnlinePaymentSum');
+const calcCashAmount = document.getElementById('calcCashAmount');
+const calcExpensesTotal = document.getElementById('calcExpensesTotal');
+const balanceAmount = document.getElementById('balanceAmount');
+
+// Expenses UI
+const expander = document.getElementById('expander');
+const expensesPanel = document.getElementById('expensesPanel');
+const expenseDesc = document.getElementById('expenseDesc');
+const expenseAmount = document.getElementById('expenseAmount');
+const expenseType = document.getElementById('expenseType');
+const addExpenseBtn = document.getElementById('addExpenseBtn');
+const clearExpensesBtn = document.getElementById('clearExpensesBtn');
+const expensesTableBody = document.querySelector('#expensesTable tbody');
+const expensesTotalSpan = document.getElementById('expensesTotal');
+
+/* ---------- IndexedDB Setup and Data Structures ---------- */
+const DB_NAME = 'ShopDeliveryDB';
+const DB_VERSION = 2; 
+
+const STORE_DATA = 'dataRows';              
+const STORE_EXPENSES = 'expenses';          
+const STORE_STATUS = 'shopStatus';          
+const STORE_PAYMENTS = 'shopPayments';      
+const STORE_DENOM_SUMMARY = 'denominationsSummary'; 
+const STORE_SHOP_DENOMS = 'shopDenominations';    
+const STORE_EXPENSE_DENOMS = 'expenseDenomination'; 
+
+let db;
+let dataRows = []; 
+let shopStatus = {}; 
+let shopPayments = {}; 
+let denominationsSummary = {}; // Local cache of total denoms
+let shopDenominations = {}; 
+let expenses = []; 
+let expenseDenominations = {}; 
+
+let editingIndex = -1; 
+let editingExpenseId = -1; 
+
+/* ---------- DARK MODE LOGIC (NEW) ---------- */
+function toggleDarkMode() {
+    const body = document.body;
+    body.classList.toggle('dark-mode');
+    
+    // Save preference
+    const isDarkMode = body.classList.contains('dark-mode');
+    localStorage.setItem('darkModePreference', isDarkMode ? 'dark' : 'light');
+    
+    // Update button icon
+    updateDarkModeToggleIcon(isDarkMode);
+}
+
+function updateDarkModeToggleIcon(isDarkMode) {
+    const toggleButton = document.getElementById('darkModeToggle');
+    if (toggleButton) {
+        toggleButton.textContent = isDarkMode ? '☀️' : '🌙';
+    }
+}
+
+// Function to apply saved preference on load
+function loadDarkModePreference() {
+    const preference = localStorage.getItem('darkModePreference');
+    // Check if preference is set to dark OR if no preference is set and the system prefers dark mode
+    const isDarkMode = (preference === 'dark') || (!preference && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    
+    if (isDarkMode) {
+        document.body.classList.add('dark-mode');
+    }
+    updateDarkModeToggleIcon(isDarkMode);
+}
+
+/* ---------- EXPORT TO XLSX FUNCTION (REPLACING CSV) ---------- */
+/**
+ * Fetches all application data from IndexedDB and exports it to a multi-sheet XLSX file.
+ */
+async function exportDataToXLSX() {
+    
+    // Check for XLSX library presence
+    if (typeof XLSX === 'undefined') {
+        alert("XLSX library not loaded. Cannot export. Please check internet connection or CDN link.");
+        return;
+    }
+
+    // Helper function for consistent formatting
+    const formatAmount = (amount) => amount !== undefined && amount !== null ? parseFloat(amount).toFixed(2) : '0.00';
+    const formatNumber = (num) => num !== undefined && num !== null ? parseInt(num).toString() : '0';
+
+    try {
+        // 1. Fetch All Raw Data 
+        const dataRowsArray = await dbGetAll(STORE_DATA);
+        const expensesArray = await dbGetAll(STORE_EXPENSES);
+        const statusArray = await dbGetAll(STORE_STATUS);
+        const paymentsArray = await dbGetAll(STORE_PAYMENTS);
+        const denomSummaryArray = await dbGetAll(STORE_DENOM_SUMMARY);
+        const shopDenomsArray = await dbGetAll(STORE_SHOP_DENOMS);
+        const expenseDenomsArray = await dbGetAll(STORE_EXPENSE_DENOMS);
+
+        // 2. Map Data Structures (Same as in original CSV logic)
+        const shopStatus = statusArray.reduce((acc, curr) => { acc[curr.shop] = curr.isDelivered; return acc; }, {});
+        const shopPayments = paymentsArray.reduce((acc, curr) => { acc[curr.shop] = { cash: curr.cash, online: curr.online }; return acc; }, {});
+        const shopDenominations = shopDenomsArray.reduce((acc, curr) => { acc[curr.shop] = curr.denoms; return acc; }, {});
+        const expenseDenominations = expenseDenomsArray.reduce((acc, curr) => { acc[curr.id] = curr.denoms; return acc; }, {});
+        
+        let denominationsSummary = denomSummaryArray.reduce((acc, curr) => { acc[curr.denom] = curr.count; return acc; }, {});
+        let actualCash = 0;
+        DENOMINATIONS.forEach(d => {
+            const count = denominationsSummary[d] || 0;
+            denominationsSummary[d] = count;
+            actualCash += d * count;
+        });
+        
+        // 3. Perform Financial Calculations (Same as in original CSV logic)
+        const deliveredCollection = calculateDeliveredCollectionTotal(dataRowsArray, shopStatus);
+        const onlinePaymentSum = calculateOnlinePaymentSum(shopPayments);
+        const totalExpenses = expensesArray.reduce((sum, exp) => sum + exp.amount, 0);
+        const expectedCash = deliveredCollection - onlinePaymentSum - totalExpenses;
+        const balance = expectedCash - actualCash;
+        
+        const totalSalesValue = dataRowsArray.reduce((sum, r) => sum + (r.quantity * r.amount), 0);
+        const totalQty = dataRowsArray.reduce((sum, r) => sum + r.quantity, 0);
+        
+        // --- DATA PREPARATION FOR XLSX SHEETS ---
+
+        // Sheet 1: FINANCIAL SUMMARY
+        const SummaryData = [
+            { 'Metric': 'Total Sales Value (All Entries)', 'Value': `₹${formatAmount(totalSalesValue)}` },
+            { 'Metric': 'Total Quantity (All Entries)', 'Value': formatNumber(totalQty) },
+            { 'Metric': 'Total Delivered Collection', 'Value': `₹${formatAmount(deliveredCollection)}` },
+            { 'Metric': 'Total Expenses', 'Value': `₹${formatAmount(totalExpenses)}` },
+            { 'Metric': 'Total Online Payments', 'Value': `₹${formatAmount(onlinePaymentSum)}` },
+            { 'Metric': 'Cash EXPECTED (Collection - Online - Expenses)', 'Value': `₹${formatAmount(expectedCash)}` },
+            { 'Metric': 'Cash ACTUAL (Denomination Count)', 'Value': `₹${formatAmount(actualCash)}` },
+            { 'Metric': 'ACTUAL CASH BALANCE / DIFF', 'Value': `₹${formatAmount(balance)}` }
+        ];
+
+        // Sheet 2: DENOMINATION SUMMARY (CASH ON HAND)
+        const DenomData = DENOMINATIONS.map(d => ({
+            'Denomination (₹)': d,
+            'Count': formatNumber(denominationsSummary[d] || 0),
+            'Total (₹)': `₹${formatAmount(d * (denominationsSummary[d] || 0))}`
+        }));
+        DenomData.push({ 'Denomination (₹)': 'Grand Total Cash', 'Count': '', 'Total (₹)': `₹${formatAmount(actualCash)}` });
+
+        // Sheet 3: SALES ENTRIES
+        const SalesData = dataRowsArray.map(row => ({
+            'Index': row.index || '',
+            'Shop': row.shop,
+            'Category (SKU)': row.category,
+            'Quantity': formatNumber(row.quantity),
+            'Amount (₹) per unit': `₹${formatAmount(row.amount)}`,
+            'Total (₹) for entry': `₹${formatAmount(row.quantity * row.amount)}`
+        }));
+        
+        // Sheet 4: SHOP DELIVERY AND PAYMENT DETAILS
+        const groupByShop = (data) => data.reduce((groups, row) => {
+            if (!groups[row.shop]) groups[row.shop] = { totalCollection: 0 };
+            groups[row.shop].totalCollection += row.quantity * row.amount;
+            return groups;
+        }, {});
+        
+        const shopSalesMap = groupByShop(dataRowsArray);
+        const shopNames = Object.keys(shopSalesMap).sort();
+        
+        const ShopDetailsData = shopNames.map(shop => {
+            const isDelivered = shopStatus[shop] || false;
+            const total = shopSalesMap[shop].totalCollection;
+            const payments = shopPayments[shop] || { cash: 0, online: 0 };
+            const statusText = isDelivered ? 'DELIVERED' : 'PENDING';
+            const denoms = shopDenominations[shop] || {};
+            
+            // Format denomination breakdown (same logic as original CSV)
+            const denomBreakdown = DENOMINATIONS.filter(d => denoms[d] > 0)
+                .map(d => `${formatNumber(denoms[d])} x ${d} (₹${formatAmount(denoms[d] * d)})`).join('; ');
+
+            return {
+                'Shop': shop,
+                'Total Collection (₹)': `₹${formatAmount(total)}`,
+                'Status': statusText,
+                'Cash Received (₹)': `₹${formatAmount(payments.cash)}`,
+                'Online Paid (₹)': `₹${formatAmount(payments.online)}`,
+                'Denomination Breakdown': denomBreakdown
+            };
+        });
+
+        // Sheet 5: EXPENSES
+        const ExpensesData = expensesArray.map(exp => {
+            const denoms = expenseDenominations[exp.id] || {};
+            
+            // Format denomination breakdown (same logic as original CSV)
+            const denomBreakdown = DENOMINATIONS.filter(d => denoms[d] > 0)
+                .map(d => `${formatNumber(denoms[d])} x ${d} (₹${formatAmount(denoms[d] * d)})`).join('; ');
+
+            return {
+                'ID': exp.id,
+                'Description': exp.desc,
+                'Amount (₹)': `₹${formatAmount(exp.amount)}`,
+                'Type': exp.type,
+                'Denomination Breakdown': denomBreakdown
+            };
+        });
+
+        // Sheet 6: UNDELIVERED SKUS
+        const returnQuantities = {};
+        dataRowsArray.forEach(row => {
+            if (!shopStatus[row.shop]) {
+                returnQuantities[row.category] = (returnQuantities[row.category] || 0) + row.quantity;
+            }
+        });
+
+        const returnKeys = Object.keys(returnQuantities).sort();
+        const UndeliveredData = returnKeys.map(k => ({
+            'SKU (Category)': k,
+            'Quantity': formatNumber(returnQuantities[k])
+        }));
+        if (UndeliveredData.length === 0) {
+             // To match the original CSV structure when empty
+            UndeliveredData.push({ 'SKU (Category)': 'No return items found.', 'Quantity': 0 }); 
+        }
+
+        // 4. Create Workbook and Sheets
+        const wb = XLSX.utils.book_new();
+
+        // Add Sheets
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(SummaryData), "FINANCIAL_SUMMARY");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(DenomData), "CASH_ON_HAND");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(SalesData), "SALES_ENTRIES");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(ShopDetailsData), "SHOP_DETAILS");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(ExpensesData), "EXPENSES");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(UndeliveredData), "UNDELIVERED_SKUS");
+        
+        // 5. Trigger Download
+        XLSX.writeFile(wb, 'ShopDeliveryTracker_Export.xlsx');
+
+        alert("Export successful. Downloading 'ShopDeliveryTracker_Export.xlsx'.");
+
+    } catch (error) {
+        console.error("Failed to export data to XLSX:", error);
+        alert("An error occurred during XLSX export. Check the console for details.");
+    }
+}
+
+
+/* ---------- ORIGINAL EXPORT TO CSV FUNCTION (RENAMED/REMOVED TO PREVENT CONFLICT) ---------- */
+// The original exportDataToCSV function logic has been replaced by exportDataToXLSX above.
+
+
+/* ---------- IMPORT CSV FUNCTIONALITY (NEW) ---------- */
+importCsvBtn.addEventListener('click', () => {
+  csvFileInput.click();
+});
+
+csvFileInput.addEventListener('change', handleFileSelect);
+
+/**
+ * Reads the selected CSV file content and passes it for parsing.
+ */
+async function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (!file) {
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        const csvContent = e.target.result;
+        await parseAndSaveCsv(csvContent);
+        // Clear file input so the same file can be imported again
+        csvFileInput.value = ''; 
+    };
+    reader.onerror = () => {
+        alert("Error reading file.");
+        csvFileInput.value = ''; 
+    };
+
+    reader.readAsText(file);
+}
+
+/**
+ * Simple CSV parser. Expects columns: Shop, Category, Quantity, Amount.
+ * Handles simple quoted fields but not complex quoting/escaping rules.
+ */
+function parseCsv(csvString) {
+    const lines = csvString.trim().split('\n');
+    if (lines.length === 0) return [];
+
+    // Check if the first line looks like a header (to skip it)
+    const headerLine = lines[0].trim().toLowerCase(); 
+    const expectedHeaders = ['shop', 'category', 'quantity', 'amount']; 
+    
+    // Simple check: if the first line contains at least the expected header keywords, skip it.
+    let dataStartLine = 0;
+    if (expectedHeaders.every(h => headerLine.includes(h))) {
+        dataStartLine = 1;
+    }
+    
+    const results = [];
+    for (let i = dataStartLine; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+
+        // Simple split by comma, cleaning up surrounding quotes.
+        const columns = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(col => col.trim().replace(/^"|"$/g, ''));
+
+        // Ensure we have at least 4 columns
+        if (columns.length >= 4) {
+            results.push({
+                shop: columns[0],
+                category: columns[1],
+                quantity: columns[2],
+                amount: columns[3]
+            });
+        }
+    }
+    return results;
+}
+
+/**
+ * Saves the parsed CSV data rows to IndexedDB.
+ */
+async function parseAndSaveCsv(csvContent) {
+    const parsedData = parseCsv(csvContent);
+    if (parsedData.length === 0) {
+        alert("No valid data found in CSV file. Please ensure it has at least 4 columns: Shop, Category (SKU), Quantity, Amount (₹).");
+        return;
+    }
+
+    if (!confirm(`Found ${parsedData.length} rows to import. Do you want to proceed?`)) {
+        return;
+    }
+
+    let successCount = 0;
+    let failedCount = 0;
+
+    for (const row of parsedData) {
+        const shop = row.shop.trim();
+        const category = row.category.trim();
+        const quantity = parseInt(row.quantity, 10);
+        const amount = parseFloat(row.amount);
+        
+        // Validation 
+        if (!shop || !category || isNaN(quantity) || quantity < 1 || isNaN(amount) || amount < 0) {
+            console.warn("Skipping invalid CSV row:", row);
+            failedCount++;
+            continue;
+        }
+
+        const newEntry = { shop, category, quantity, amount };
+        
+        try {
+            // Check if the shop was already delivered
+            const wasDelivered = shopStatus[shop];
+
+            const newIndex = await dbPut(STORE_DATA, newEntry);
+            dataRows.push({ ...newEntry, index: newIndex });
+
+            if (wasDelivered) {
+                // If the shop was delivered, adding new data means the status must be reset
+                await removeShopDeliveryAndDenominations(shop);
+            }
+
+            successCount++;
+
+        } catch (error) {
+            console.error("Error saving data entry from CSV:", error);
+            failedCount++;
+        }
+    }
+
+    await postUpdateCleanUpAndNotify();
+
+    alert(`CSV Import Complete:\nSuccessfully imported ${successCount} rows.\nFailed to import ${failedCount} rows (check console for details).`);
+}
+
+/* ---------- IDB HELPERS (no change) ---------- */
+
+function openDatabase() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+        request.onupgradeneeded = (event) => {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains(STORE_DATA)) {
+                db.createObjectStore(STORE_DATA, { keyPath: 'index', autoIncrement: true });
+            }
+            if (!db.objectStoreNames.contains(STORE_EXPENSES)) {
+                db.createObjectStore(STORE_EXPENSES, { keyPath: 'id', autoIncrement: true });
+            }
+            if (!db.objectStoreNames.contains(STORE_STATUS)) {
+                db.createObjectStore(STORE_STATUS, { keyPath: 'shop' });
+            }
+            if (!db.objectStoreNames.contains(STORE_PAYMENTS)) {
+                db.createObjectStore(STORE_PAYMENTS, { keyPath: 'shop' });
+            }
+            if (!db.objectStoreNames.contains(STORE_DENOM_SUMMARY)) {
+                db.createObjectStore(STORE_DENOM_SUMMARY, { keyPath: 'denom' });
+            }
+            if (!db.objectStoreNames.contains(STORE_SHOP_DENOMS)) {
+                db.createObjectStore(STORE_SHOP_DENOMS, { keyPath: 'shop' });
+            }
+            if (!db.objectStoreNames.contains(STORE_EXPENSE_DENOMS)) {
+                db.createObjectStore(STORE_EXPENSE_DENOMS, { keyPath: 'id' });
+            }
+        };
+
+        request.onsuccess = (event) => {
+            db = event.target.result;
+            resolve(db);
+        };
+
+        request.onerror = (event) => {
+            reject("Database error: " + event.target.errorCode);
+        };
+    });
+}
+
+function dbTransaction(storeName, mode, callback) {
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(storeName, mode);
+        const store = transaction.objectStore(storeName);
+
+        transaction.oncomplete = () => resolve(true);
+        transaction.onerror = (event) => reject("Transaction error: " + event.target.errorCode);
+
+        callback(store, resolve, reject);
+    });
+}
+
+async function dbGetAll(storeName) {
+    return new Promise((resolve, reject) => {
+        dbTransaction(storeName, 'readonly', (store) => {
+            const request = store.getAll();
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = (event) => reject("Error getting all: " + event.target.errorCode);
+        });
+    });
+}
+
+async function dbPut(storeName, data) {
+    return new Promise((resolve, reject) => {
+        dbTransaction(storeName, 'readwrite', (store) => {
+            const request = store.put(data);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = (event) => reject("Error putting data: " + event.target.errorCode);
+        });
+    });
+}
+
+async function dbDelete(storeName, key) {
+    return new Promise((resolve, reject) => {
+        dbTransaction(storeName, 'readwrite', (store) => {
+            const request = store.delete(key);
+            request.onsuccess = () => resolve(true);
+            request.onerror = (event) => reject("Error deleting data: " + event.target.errorCode);
+        });
+    });
+}
+
+async function dbClear(storeName) {
+    return new Promise((resolve, reject) => {
+        dbTransaction(storeName, 'readwrite', (store) => {
+            const request = store.clear();
+            request.onsuccess = () => resolve(true);
+            request.onerror = (event) => reject("Error clearing store: " + event.target.errorCode);
+        });
+    });
+}
+
+
+/* ---------- UTILITY FUNCTIONS (no change) ---------- */
+// ... (All other utility functions, listeners, modal logic, etc., remain the same)
+// The remaining code from the original file should be included here.
+// Please ensure you copy the entirety of the original script after this point 
+// and replace the existing `exportDataToCSV` function with the new `exportDataToXLSX`
+// block provided above. 
+// ...
+
+async function loadAllData() {
+    try {
+        const dataRowsArray = await dbGetAll(STORE_DATA);
+        dataRows = dataRowsArray.sort((a,b) => (a.shop > b.shop) ? 1 : ((b.shop > a.shop) ? -1 : 0));
+        
+        const statusArray = await dbGetAll(STORE_STATUS);
+        shopStatus = statusArray.reduce((acc, curr) => { acc[curr.shop] = curr.isDelivered; return acc; }, {});
+        
+        const paymentsArray = await dbGetAll(STORE_PAYMENTS);
+        shopPayments = paymentsArray.reduce((acc, curr) => { acc[curr.shop] = { cash: curr.cash, online: curr.online }; return acc; }, {});
+
+        const denomSummaryArray = await dbGetAll(STORE_DENOM_SUMMARY);
+        denominationsSummary = denomSummaryArray.reduce((acc, curr) => { acc[curr.denom] = curr.count; return acc; }, {});
+        DENOMINATIONS.forEach(d => denominationsSummary[d] = denominationsSummary[d] || 0); // Initialize missing denoms
+        
+        const shopDenomsArray = await dbGetAll(STORE_SHOP_DENOMS);
+        shopDenominations = shopDenomsArray.reduce((acc, curr) => { acc[curr.shop] = curr.denoms; return acc; }, {});
+        
+        const expensesArray = await dbGetAll(STORE_EXPENSES);
+        expenses = expensesArray.sort((a,b) => a.id - b.id);
+        
+        const expenseDenomsArray = await dbGetAll(STORE_EXPENSE_DENOMS);
+        expenseDenominations = expenseDenomsArray.reduce((acc, curr) => { acc[curr.id] = curr.denoms; return acc; }, {});
+
+        // Initial render
+        renderTable();
+        calculatePaymentBalance();
+        populateCategorySelect();
+        renderOverallSummary(); // Ensure summary is rendered on load
+    } catch (error) {
+        console.error("Failed to load data from IndexedDB:", error);
+        alert("Failed to load all data. Check console for details.");
+    }
+}
+
+/* ---------- PAGE NAVIGATION ---------- */
+function changePage(pageId) {
+    const pages = ['sales', 'shops', 'denoms', 'expenses', 'summary']; // Added 'summary'
+    pages.forEach(id => {
+        const element = document.getElementById(`page-${id}`);
+        const navButton = document.getElementById(`nav-${id}`);
+        if (element) element.style.display = 'none';
+        if (navButton) navButton.classList.remove('active');
+    });
+
+    const newPage = document.getElementById(`page-${pageId}`);
+    const newNavButton = document.getElementById(`nav-${pageId}`);
+    if (newPage) newPage.style.display = 'block';
+    if (newNavButton) newNavButton.classList.add('active');
+
+    // Rerender only the active page's content
+    if (pageId === 'shops') {
+        renderTable();
+    } else if (pageId === 'denoms') {
+        renderDenominationSummary();
+        calculatePaymentBalance();
+    } else if (pageId === 'expenses') {
+        renderExpensesTable();
+    } else if (pageId === 'summary') {
+        // Trigger summary render
+        renderOverallSummary();
+    }
+}
+
+/* ---------- GROUP & RENDER TABLE (Shop Details Page) ---------- */
+function groupByShop(data) {
+    const groups = {};
+    data.forEach((row, idx) => {
+        const index = row.index !== undefined ? row.index : idx;
+        if (!groups[row.shop]) groups[row.shop] = { rows: [], categoryTotals: {}, totalCollection: 0 };
+
+        const rowTotal = row.quantity * row.amount;
+        groups[row.shop].rows.push({ ...row, index: index, rowTotal });
+
+        const key = `${row.shop}-${row.category}`;
+        groups[row.shop].categoryTotals[key] = (groups[row.shop].categoryTotals[key] || 0) + rowTotal;
+        groups[row.shop].totalCollection += rowTotal;
+    });
+    return groups;
+}
+
+function renderTable() {
+    dataTableBody.innerHTML = '';
+    const grouped = groupByShop(dataRows);
+    let totalQuantity = 0;
+    let totalAmount = 0;
+    
+    const shopNames = Object.keys(grouped).sort();
+
+    shopNames.forEach(shop => {
+        const totalCollection = grouped[shop].totalCollection;
+        const isDelivered = shopStatus[shop] || false;
+        
+        // Add a row for the shop total and status
+        const shopRow = document.createElement('tr');
+        shopRow.style.backgroundColor = isDelivered ? '#ccffcc' : '#ffcccc'; // LightGreen for Delivered, LightRed for Pending
+        shopRow.style.fontWeight = 'bold';
+
+        const checkboxHtml = `<input type="checkbox" onchange="toggleDeliveryStatus('${shop}', ${totalCollection})" ${isDelivered ? 'checked' : ''} style="width: 20px; height: 20px; margin: 0; display:inline-block;" />`;
+        const labelText = isDelivered ? 'Delivered' : 'Pending';
+        const labelStyle = isDelivered ? 'color:#3cb371' : 'color:#ff6347'; // MediumSeaGreen or Tomato
+
+        const shopCell = document.createElement('td');
+        shopCell.colSpan = 6;
+        shopCell.style.textAlign = 'left';
+        shopCell.innerHTML = `
+        <div class="shop-header-content">
+            <span class="clickable-shop" title="Click to see total collection">${shop}</span>
+            <label style="display:flex; align-items:center; gap:8px; ${labelStyle}">
+                ${labelText}
+                ${checkboxHtml}
+            </label>
+        </div>
+        `;
+        shopCell.querySelector('.clickable-shop').addEventListener('click', () => {
+            openModal('customModal', shop, totalCollection);
+        });
+        shopRow.appendChild(shopCell);
+        dataTableBody.appendChild(shopRow);
+
+
+        grouped[shop].rows.forEach(row => {
+            const tr = document.createElement('tr');
+            const key = `${row.shop}-${row.category}`;
+            const categoryTotal = grouped[shop].categoryTotals[key] || 0;
+
+            tr.innerHTML = `
+                <td>${row.shop}</td>
+                <td>${row.category}</td>
+                <td>${row.quantity}</td>
+                <td>${row.amount.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                <td>${categoryTotal.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+                <td>
+                    <button onclick="editEntry(${row.index})" style="width: auto; padding: 4px 8px; font-size: 14px; margin: 0 4px;">Edit</button>
+                    <button onclick="deleteEntry(${row.index})" style="width: auto; padding: 4px 8px; font-size: 14px; margin: 0;">Delete</button>
+                </td>
+            `;
+            dataTableBody.appendChild(tr);
+
+            totalAmount += row.rowTotal;
+            totalQuantity += row.quantity;
+        });
+    });
+
+    totalAmountCell.textContent = totalAmount.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+    totalQuantityCell.textContent = totalQuantity;
+    
+    populateCategorySelect();
+    renderReturnItemsTable();
+}
+
+/* ---------- Category Select Population (Replaces Filter logic) ---------- */
+function populateCategorySelect() {
+    const categories = [...new Set(dataRows.map(r => r.category))].sort();
+    categorySelect.innerHTML = '<option value="" disabled selected>Select SKU or Enter New</option>';
+    categories.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        categorySelect.appendChild(opt);
+    });
+    const newSkuOpt = document.createElement('option');
+    newSkuOpt.value = 'NEW_SKU_ENTRY';
+    newSkuOpt.textContent = '** Enter New SKU **';
+    categorySelect.appendChild(newSkuOpt);
+}
+
+/* ---------- Return Items Table (Shop Details Page) ---------- */
+function renderReturnItemsTable() {
+    const returnItemsTableBody = document.querySelector('#returnItemsTable tbody');
+    returnItemsTableBody.innerHTML = '';
+    
+    const returnQuantities = {};
+    dataRows.forEach(row => {
+        if (!shopStatus[row.shop]) {
+            returnQuantities[row.category] = (returnQuantities[row.category] || 0) + row.quantity;
+        }
+    });
+
+    const returnKeys = Object.keys(returnQuantities).sort();
+    if (returnKeys.length === 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td colspan="2">No return items found. All SKUs are accounted for in delivered shops.</td>`;
+        returnItemsTableBody.appendChild(tr);
+        return;
+    }
+
+    returnKeys.forEach(key => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${key}</td><td>${returnQuantities[key]}</td>`;
+        returnItemsTableBody.appendChild(tr);
+    });
+}
+
+/* ---------- Toggle Delivery Status (Shop Details Page) ---------- */
+let currentShopForPayment = null;
+let currentShopTotalForPayment = 0;
+
+async function toggleDeliveryStatus(shopName, total) {
+    const checkbox = document.querySelector(`input[onchange*="${shopName}"]`);
+    if (!checkbox) return;
+
+    if (checkbox.checked) {
+        // Tentatively mark as delivered (if successful, it will be saved)
+        currentShopForPayment = shopName;
+        currentShopTotalForPayment = total;
+        document.getElementById('paymentShopName').textContent = shopName;
+        document.getElementById('paymentShopTotal').textContent = total.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+        
+        // Show payment modal instead of directly marking status
+        paymentTypeModal.style.display = 'block';
+
+        // Uncheck the box until payment is confirmed
+        checkbox.checked = false; 
+
+    } else {
+        // If unchecking, revert status and remove payment/denomination records
+        if (!confirm(`Are you sure you want to mark ${shopName} as Undelivered? This will remove its payment and denomination records.`)) {
+             checkbox.checked = true; // Keep it checked if user cancels
+             return;
+        }
+        await removeShopDeliveryAndDenominations(shopName);
+        renderTable(); // Rerender to show pending status
+    }
+}
+
+async function removeShopDeliveryAndDenominations(shopName) {
+    try {
+        if (shopDenominations[shopName]) {
+            // Revert the denominations from the total summary
+            await updateDenominationSummary(shopDenominations[shopName], false);
+            delete shopDenominations[shopName];
+            await dbDelete(STORE_SHOP_DENOMS, shopName);
+        }
+
+        delete shopStatus[shopName];
+        delete shopPayments[shopName];
+        await dbDelete(STORE_STATUS, shopName);
+        await dbDelete(STORE_PAYMENTS, shopName);
+        
+        await postUpdateCleanUpAndNotify(); // NOW AWAITED
+    } catch (error) {
+        console.error("Error removing delivery data:", error);
+        alert("An error occurred while reverting delivery status.");
+    }
+}
+
+function confirmPayment(type) {
+    const shopName = currentShopForPayment;
+    const total = currentShopTotalForPayment;
+    closeModal('paymentTypeModal');
+
+    if (type === 'Cash') {
+        openDenomModal(shopName, total, async (denoms) => {
+            await finalizePayment(shopName, total, 0, denoms);
+            const checkbox = document.querySelector(`input[onchange*="${shopName}"]`);
+            if (checkbox) checkbox.checked = true;
+        });
+    } else if (type === 'Online') {
+        finalizePayment(shopName, 0, total, null);
+        const checkbox = document.querySelector(`input[onchange*="${shopName}"]`);
+        if (checkbox) checkbox.checked = true;
+    }
+}
+
+function openPartialPaymentModal() {
+    const shopName = currentShopForPayment;
+    const total = currentShopTotalForPayment;
+    
+    document.getElementById('partialShopName').textContent = shopName;
+    document.getElementById('partialRequiredTotal').textContent = total.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+    partialCashAmountInput.value = '';
+    partialOnlineAmountInput.value = total.toFixed(2);
+    partialErrorDiv.style.display = 'none';
+
+    closeModal('paymentTypeModal');
+    document.getElementById('partialPaymentModal').style.display = 'block';
+
+    updatePartialSumEntered();
+
+    partialCashAmountInput.oninput = updatePartialSumEntered;
+    partialOnlineAmountInput.oninput = updatePartialSumEntered;
+}
+
+function updatePartialSumEntered() {
+    const total = currentShopTotalForPayment;
+    const cash = parseFloat(partialCashAmountInput.value) || 0;
+    const online = parseFloat(partialOnlineAmountInput.value) || 0;
+    const sum = cash + online;
+
+    document.getElementById('partialSumEntered').textContent = sum.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+    if (Math.abs(sum - total) > 0.01) {
+        partialErrorDiv.style.display = 'block';
+    } else {
+        partialErrorDiv.style.display = 'none';
+    }
+}
+
+function closePartialPaymentModal() {
+    document.getElementById('partialPaymentModal').style.display = 'none';
+}
+
+
+function confirmPartialPayment() {
+    const shopName = currentShopForPayment;
+    const total = currentShopTotalForPayment;
+    const cash = parseFloat(partialCashAmountInput.value) || 0;
+    const online = parseFloat(partialOnlineAmountInput.value) || 0;
+    const sum = cash + online;
+
+    if (Math.abs(sum - total) > 0.01) {
+        alert("The sum of Cash and Online payments must exactly equal the Shop Total.");
+        return;
+    }
+
+    closePartialPaymentModal();
+
+    if (cash > 0) {
+        openDenomModal(shopName, cash, async (denoms) => {
+            await finalizePayment(shopName, cash, online, denoms);
+            const checkbox = document.querySelector(`input[onchange*="${shopName}"]`);
+            if (checkbox) checkbox.checked = true;
+        });
+    } else {
+        finalizePayment(shopName, 0, online, null);
+        const checkbox = document.querySelector(`input[onchange*="${shopName}"]`);
+        if (checkbox) checkbox.checked = true;
+    }
+}
+
+async function finalizePayment(shopName, cashAmount, onlineAmount, denoms) {
+    try {
+        // 1. Update Status and Payments
+        shopStatus[shopName] = true;
+        shopPayments[shopName] = { cash: cashAmount, online: onlineAmount };
+
+        await dbPut(STORE_STATUS, { shop: shopName, isDelivered: true });
+        await dbPut(STORE_PAYMENTS, { shop: shopName, cash: cashAmount, online: onlineAmount });
+
+        // 2. Handle Denominations (if cash was collected)
+        if (cashAmount > 0 && denoms) {
+            shopDenominations[shopName] = denoms;
+            // Update summary (subtracting expense denoms which were already subtracted from total)
+            await updateDenominationSummary(denoms, true); 
+            await dbPut(STORE_SHOP_DENOMS, { shop: shopName, denoms: denoms });
+        }
+        
+        await postUpdateCleanUpAndNotify(); // NOW AWAITED
+        alert(`Payment for ${shopName} recorded as: Cash: ₹${cashAmount.toFixed(2)}, Online: ₹${onlineAmount.toFixed(2)}`);
+
+    } catch (error) {
+        console.error("Error finalizing payment:", error);
+        alert("An error occurred while finalizing payment.");
+        // Revert UI state on failure
+        const checkbox = document.querySelector(`input[onchange*="${shopName}"]`);
+        if (checkbox) checkbox.checked = false;
+        await removeShopDeliveryAndDenominations(shopName);
+    } finally {
+        currentShopForPayment = null;
+        currentShopTotalForPayment = 0;
+    }
+}
+
+function cancelPaymentConfirmation() {
+    const checkbox = document.querySelector(`input[onchange*="${currentShopForPayment}"]`);
+    if (checkbox) checkbox.checked = false; // Revert the checkbox state
+    closeModal('paymentTypeModal');
+    currentShopForPayment = null;
+    currentShopTotalForPayment = 0;
+}
+
+
+/* ---------- Denomination Modal Logic ---------- */
+let currentDenomCallback = null;
+let currentDenomEntity = null; // Can be shop name (string) or expense id (number)
+let currentDenomRequiredTotal = 0;
+
+function openDenomModal(entity, requiredTotal, callback) {
+    currentDenomEntity = entity;
+    currentDenomRequiredTotal = requiredTotal;
+    currentDenomCallback = callback;
+
+    denomModalTitle.textContent = typeof entity === 'string' ? `Enter Denominations for ${entity}` : 'Enter Expense Denominations';
+    denomModalNote.innerHTML = `Cash Amount Required: <strong style="color:red">₹${requiredTotal.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}</strong>`;
+
+    let initialDenoms = {};
+    if (typeof entity === 'string' && shopDenominations[entity]) {
+        initialDenoms = shopDenominations[entity];
+    } else if (typeof entity === 'number' && expenseDenominations[entity]) {
+        initialDenoms = expenseDenominations[entity];
+    }
+
+    denomEntryTbody.innerHTML = '';
+    DENOMINATIONS.forEach(d => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${d.toLocaleString('en-IN')}</td>
+            <td><input type="number" data-denom="${d}" class="denom-count" min="0" value="${initialDenoms[d] || ''}" oninput="updateDenomEntryTotal()" /></td>
+            <td class="denom-total" style="text-align:center ">0.00</td>
+        `;
+        denomEntryTbody.appendChild(tr);
+    });
+
+    const formattedRequiredTotal = requiredTotal.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+    denomNeededSpan.textContent = formattedRequiredTotal;
+    denomRemainingSpan.textContent = formattedRequiredTotal;
+    denomReceivedSpan.textContent = (0).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+    denomRemainingSpan.style.color = 'red';
+
+    updateDenomEntryTotal();
+    denomModal.style.display = 'block';
+}
+
+function updateDenomEntryTotal() {
+    let total = 0;
+    const inputs = denomEntryTbody.querySelectorAll('input');
+    
+    inputs.forEach(input => {
+        const denom = parseInt(input.getAttribute('data-denom'), 10);
+        const count = parseInt(input.value, 10) || 0;
+        const subtotal = denom * count;
+        
+        // Update subtotal cell
+        const totalCell = input.closest('tr').querySelector('.denom-total');
+        totalCell.textContent = subtotal.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+        
+        total += subtotal;
+    });
+
+    denomEntryTotalSpan.textContent = total.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+    denomReceivedSpan.textContent = total.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+    const remaining = currentDenomRequiredTotal - total;
+    denomRemainingSpan.textContent = remaining.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+    denomRemainingSpan.style.color = Math.abs(remaining) < 0.01 ? 'green' : 'red';
+}
+
+denomConfirmBtn.addEventListener('click', () => {
+    const inputs = denomEntryTbody.querySelectorAll('input');
+    const denoms = {};
+    const denomTotal = parseFloat(denomEntryTotalSpan.textContent.replace(/[₹,]/g, '')) || 0;
+    const requiredTotal = currentDenomRequiredTotal;
+
+    if (Math.abs(denomTotal - requiredTotal) > 0.01) {
+        alert(`Denomination total (₹${denomTotal.toFixed(2)}) must exactly match the required cash amount (₹${requiredTotal.toFixed(2)}).`);
+        return;
+    }
+
+    inputs.forEach(input => {
+        const denom = parseInt(input.getAttribute('data-denom'), 10);
+        const count = parseInt(input.value, 10) || 0;
+        if (count > 0) {
+            denoms[denom] = count;
+        }
+    });
+
+    if (currentDenomCallback) {
+        currentDenomCallback(denoms);
+    }
+    
+    cancelDenomModal();
+});
+
+function cancelDenomModal() {
+    // If cancelling a payment denom modal, uncheck the shop box to revert
+    if (typeof currentDenomEntity === 'string' && !shopStatus[currentDenomEntity]) {
+        const checkbox = document.querySelector(`input[onchange*="${currentDenomEntity}"]`);
+        if (checkbox) checkbox.checked = false;
+    }
+    closeModal('denomModal');
+    currentDenomCallback = null;
+    currentDenomEntity = null;
+    currentDenomRequiredTotal = 0;
+}
+
+
+/* ---------- Global Modals (Safe/Generic) ---------- */
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+// Function to open the Custom Modal (Shared by Shop Total and Storage Info)
+function openModal(modalId, shopName, total) {
+    const modal = document.getElementById(modalId);
+    if (modalId === 'customModal') {
+        // Reset to show Shop Total View by default
+        document.getElementById('modalShopTotalSection').style.display = 'block';
+        document.getElementById('modalGenericSection').style.display = 'none';
+
+        document.getElementById('modalShopName').textContent = `Shop: ${shopName}`;
+        document.getElementById('modalTotalAmount').textContent = total.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+    }
+    modal.style.display = 'block';
+}
+
+/* ---------- Denomination Summary Table Logic (Denoms Page) ---------- */
+function renderDenominationSummary() {
+    denomSummaryTbody.innerHTML = '';
+    let grandTotal = 0;
+
+    DENOMINATIONS.forEach(d => {
+        const count = denominationsSummary[d] || 0;
+        const total = d * count;
+        grandTotal += total;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${d.toLocaleString('en-IN')}</td>
+            <td>${count.toLocaleString('en-IN')}</td>
+            <td>${total.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+        `;
+        denomSummaryTbody.appendChild(tr);
+    });
+
+    denomCashTotal.textContent = grandTotal.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+    calcCashAmount.textContent = grandTotal.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+    
+    return grandTotal;
+}
+
+/**
+ * Updates the global denominationsSummary after a cash transaction (delivery/expense).
+ * @param {Object} denoms - Object of {denomination: count}
+ * @param {boolean} isAddition - True for delivery, False for expense (subtraction from total)
+ */
+async function updateDenominationSummary(denoms, isAddition) {
+    let transactionNeeded = false;
+    for (const d of DENOMINATIONS) {
+        const countChange = denoms[d] || 0;
+        if (countChange > 0) {
+            transactionNeeded = true;
+            if (isAddition) {
+                denominationsSummary[d] = (denominationsSummary[d] || 0) + countChange;
+            } else {
+                denominationsSummary[d] = (denominationsSummary[d] || 0) - countChange;
+            }
+            if (denominationsSummary[d] < 0) denominationsSummary[d] = 0; // Prevent negative counts
+        }
+    }
+
+    if (transactionNeeded) {
+        try {
+            // Write changes back to IndexedDB
+            await dbTransaction(STORE_DENOM_SUMMARY, 'readwrite', (store) => {
+                DENOMINATIONS.forEach(d => {
+                    store.put({ denom: d, count: denominationsSummary[d] || 0 });
+                });
+            });
+        } catch (error) {
+            console.error("Error updating global denomination summary in DB:", error);
+        }
+    }
+}
+
+
+/* ---------- Expense Logic (Expenses Page) ---------- */
+expander.addEventListener('click', () => {
+    expensesPanel.classList.toggle('hidden');
+});
+
+addExpenseBtn.addEventListener('click', async () => {
+    const desc = expenseDesc.value.trim();
+    const amount = parseFloat(expenseAmount.value);
+    const type = expenseType.value;
+
+    if (!desc || isNaN(amount) || amount <= 0) {
+        alert('Please enter a valid description and an amount (0 or greater).');
+        return;
+    }
+
+    const isEditing = addExpenseBtn.textContent.includes('Update');
+    let expenseId;
+
+    try {
+        if (isEditing) {
+            expenseId = parseInt(addExpenseBtn.getAttribute('data-edit-id'), 10);
+            const index = expenses.findIndex(e => e.id === expenseId);
+            const oldExpense = expenses[index];
+
+            // 1. REVERSE OLD DENOMINATIONS (if cash)
+            if (oldExpense.type === 'Cash' && expenseDenominations[expenseId]) {
+                // Reverse old denoms (addition to summary) before updating the expense.
+                await updateDenominationSummary(expenseDenominations[expenseId], true);
+            }
+
+            // 2. UPDATE EXPENSE IN DB & LOCAL ARRAY
+            const updatedExpense = { id: expenseId, desc, amount, type };
+            await dbPut(STORE_EXPENSES, updatedExpense);
+            expenses[index] = updatedExpense;
+
+            addExpenseBtn.textContent = 'Add Expense';
+            addExpenseBtn.removeAttribute('data-edit-id');
+            expenseDesc.value = '';
+            expenseAmount.value = '';
+            expenseType.value = 'Cash'; // Reset type
+
+            // 3. APPLY NEW DENOMINATIONS (if new type is cash)
+            if (type === 'Cash' && amount > 0) {
+                // Must open denom modal *after* updating the expense to ensure consistency if the user cancels.
+                openDenomModal(expenseId, amount, async (denoms) => {
+                    expenseDenominations[expenseId] = denoms;
+                    // Apply new denoms (subtraction from summary)
+                    await updateDenominationSummary(denoms, false);
+                    await dbPut(STORE_EXPENSE_DENOMS, { id: expenseId, denoms: denoms });
+                    await postUpdateCleanUpAndNotify(); // FINAL NOTIFY
+                });
+            } else if (expenseDenominations[expenseId]) {
+                // If the expense is no longer cash, delete denoms
+                delete expenseDenominations[expenseId];
+                await dbDelete(STORE_EXPENSE_DENOMS, expenseId);
+                await postUpdateCleanUpAndNotify(); 
+            } else {
+                 await postUpdateCleanUpAndNotify(); 
+            }
+
+        } else {
+            // ADD NEW EXPENSE
+            const newExpense = { desc, amount, type };
+            const newId = await dbPut(STORE_EXPENSES, newExpense);
+            newExpense.id = newId;
+            expenses.push(newExpense);
+
+            expenseDesc.value = '';
+            expenseAmount.value = '';
+
+            // 3. APPLY NEW DENOMINATIONS (if cash)
+            if (type === 'Cash' && amount > 0) {
+                openDenomModal(newId, amount, async (denoms) => {
+                    expenseDenominations[newId] = denoms;
+                    // Apply new denoms (subtraction from summary)
+                    await updateDenominationSummary(denoms, false);
+                    await dbPut(STORE_EXPENSE_DENOMS, { id: newId, denoms: denoms });
+                    await postUpdateCleanUpAndNotify(); // FINAL NOTIFY
+                });
+            } else {
+                await postUpdateCleanUpAndNotify(); // Just update tables if not cash
+            }
+        }
+
+    } catch (error) {
+        console.error("Error saving/updating expense:", error);
+        alert("An error occurred while saving the expense.");
+        // Re-load data to ensure consistency after a failed transaction
+        await loadAllData(); 
+    }
+});
+
+function editExpense(id) {
+    const expense = expenses.find(e => e.id === id);
+    if (!expense) return;
+
+    expenseDesc.value = expense.desc;
+    expenseAmount.value = expense.amount.toFixed(2);
+    expenseType.value = expense.type;
+    
+    addExpenseBtn.textContent = 'Update Expense';
+    addExpenseBtn.setAttribute('data-edit-id', id);
+
+    // Ensure the panel is visible for editing
+    expensesPanel.classList.remove('hidden');
+    changePage('expenses');
+}
+
+async function deleteExpense(id) {
+    if (!confirm('Are you sure you want to delete this expense? This will adjust your cash summary.')) return;
+    
+    const index = expenses.findIndex(e => e.id === id);
+    if (index === -1) return;
+
+    try {
+        const expense = expenses[index];
+
+        if (expense.type === 'Cash' && expenseDenominations[id]) {
+            // Reverse expense denoms (addition to summary)
+            await updateDenominationSummary(expenseDenominations[id], true);
+            delete expenseDenominations[id];
+            await dbDelete(STORE_EXPENSE_DENOMS, id);
+        }
+
+        await dbDelete(STORE_EXPENSES, id);
+        expenses.splice(index, 1);
+        
+        await postUpdateCleanUpAndNotify(); // NOW AWAITED
+    } catch (error) {
+        console.error("Error deleting expense:", error);
+        alert("An error occurred while deleting the expense.");
+    }
+}
+
+async function clearExpensesBtn_click() {
+    if (!confirm('Are you sure you want to delete all recorded expenses? This will adjust your cash summary.')) return;
+
+    try {
+        for (const exp of expenses.filter(e => e.type === 'Cash')) {
+            if (expenseDenominations[exp.id]) {
+                // Reverse all cash expense denoms (addition to summary)
+                await updateDenominationSummary(expenseDenominations[exp.id], true);
+            }
+        }
+        
+        await dbTransaction(STORE_EXPENSES, 'readwrite', (store) => store.clear());
+        await dbTransaction(STORE_EXPENSE_DENOMS, 'readwrite', (store) => store.clear());
+        
+        expenses = [];
+        expenseDenominations = {};
+        
+        await postUpdateCleanUpAndNotify(); // NOW AWAITED
+    } catch (error) {
+        console.error("Error clearing expenses:", error);
+        alert("An error occurred while clearing expenses.");
+    }
+}
+
+clearExpensesBtn.addEventListener('click', clearExpensesBtn_click);
+
+function editExpenseDenoms(id, amount) {
+    openDenomModal(id, amount, async (denoms) => {
+        try {
+            // 1. Reverse old denoms (if any)
+            if (expenseDenominations[id]) {
+                await updateDenominationSummary(expenseDenominations[id], true); // Add back
+            }
+            
+            // 2. Apply new denoms
+            await updateDenominationSummary(denoms, false); // Subtract new
+
+            expenseDenominations[id] = denoms;
+            await dbPut(STORE_EXPENSE_DENOMS, { id, denoms });
+            
+            await postUpdateCleanUpAndNotify(); // FINAL NOTIFY
+
+        } catch (error) {
+            console.error("Error updating expense denominations:", error);
+            alert("An error occurred while updating denominations.");
+            // Re-load data to ensure consistency after a failed transaction
+            await loadAllData(); 
+        }
+    });
+}
+
+function renderExpensesTable() {
+    expensesTableBody.innerHTML = '';
+    let total = 0;
+
+    expenses.forEach(exp => {
+        total += exp.amount;
+        const denoms = expenseDenominations[exp.id] || {};
+        const isCash = exp.type === 'Cash';
+
+        const denomDetails = isCash && Object.keys(denoms).length > 0
+            ? `<span style="font-size:10px; display:block;">(${Object.keys(denoms).map(d => `${denoms[d]}x${d}`).join(', ')}) 
+               <a href="#" onclick="event.preventDefault(); editExpenseDenoms(${exp.id}, ${exp.amount})" style="font-size:10px; color: #4682b4; text-decoration:underline;">[Edit Denoms]</a></span>`
+            : (isCash ? `<span style="font-size:10px; display:block; color:red;">No Denoms Entered! 
+               <a href="#" onclick="event.preventDefault(); editExpenseDenoms(${exp.id}, ${exp.amount})" style="font-size:10px; color: #4682b4; text-decoration:underline;">[Enter Denoms]</a></span>` : '');
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td style="text-align:left;">${exp.desc} ${denomDetails}</td>
+            <td>${exp.amount.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+            <td>${exp.type}</td>
+            <td>
+                <button onclick="editExpense(${exp.id})" style="width: auto; padding: 4px 8px; font-size: 14px; margin: 0 4px;">Edit</button>
+                <button onclick="deleteExpense(${exp.id})" style="width: auto; padding: 4px 8px; font-size: 14px; margin: 0;">Delete</button>
+            </td>
+        `;
+        expensesTableBody.appendChild(tr);
+    });
+
+    expensesTotalSpan.textContent = total.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+/* ---------- Payment/Balance Calculation (Denoms Page) ---------- */
+function calculateDeliveredCollectionTotal(data, status) {
+    let total = 0;
+    data.forEach(row => {
+        if (status[row.shop]) {
+            total += row.quantity * row.amount;
+        }
+    });
+    return total;
+}
+
+function calculateOnlinePaymentSum(payments) {
+    let sum = 0;
+    Object.values(payments).forEach(p => {
+        sum += (p.online || 0);
+    });
+    return sum;
+}
+
+function calculatePaymentBalance() {
+    const deliveredCollection = calculateDeliveredCollectionTotal(dataRows, shopStatus);
+    const onlinePaymentSum = calculateOnlinePaymentSum(shopPayments);
+    const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+    const actualCash = renderDenominationSummary(); // Also updates calcCashAmount
+
+    calcDeliveredCollection.textContent = deliveredCollection.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+    calcOnlinePaymentSum.textContent = onlinePaymentSum.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+    calcExpensesTotal.textContent = totalExpenses.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+    const expectedCash = deliveredCollection - onlinePaymentSum - totalExpenses;
+    const balance = expectedCash - actualCash;
+    
+    balanceAmount.textContent = balance.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+    balanceAmount.style.color = Math.abs(balance) < 0.01 ? 'green' : 'red';
+    
+    return { deliveredCollection, onlinePaymentSum, totalExpenses, expectedCash, actualCash, balance };
+}
+
+/* ---------- RENDER OVERALL SUMMARY (UPDATED FOR EXPANDABLE SHOP LIST) ---------- */
+function renderOverallSummary() {
+    const summaryDiv = document.getElementById('summaryContent');
+
+    // Helper functions for currency formatting
+    const formatCurrency = (amount) => amount.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+    const formatNumber = (num) => Number(num).toLocaleString('en-IN', {minimumFractionDigits:0});
+
+    let html = '';
+
+    // Calculate all master totals
+    const { deliveredCollection, onlinePaymentSum, totalExpenses, expectedCash, actualCash, balance } = calculatePaymentBalance();
+    
+    const totalSalesValue = dataRows.reduce((sum, r) => sum + (r.quantity * r.amount), 0);
+    const totalQty = dataRows.reduce((sum, r) => sum + r.quantity, 0);
+
+
+    // --- 1. Master Totals and Balance (Always visible, Page 1) ---
+    html += `<h4 style="margin: 10px 0; color: #ff4500;">MASTER FINANCIAL SUMMARY</h4>`;
+    html += `<table style="font-size: 10px; width: 100%;">`;
+    html += `<thead><tr><th>Metric</th><th>Total (₹)</th><th>Qty</th></tr></thead>`;
+    html += `<tbody>`;
+    html += `<tr><td>Total Sales Value (All Entries)</td><td>${formatCurrency(totalSalesValue)}</td><td>${formatNumber(totalQty)}</td></tr>`;
+    html += `<tr><td>Total Delivered Collection</td><td>${formatCurrency(deliveredCollection)}</td><td>-</td></tr>`;
+    html += `<tr><td>Total Expenses</td><td style="color:red;">${formatCurrency(totalExpenses)}</td><td>-</td></tr>`;
+    html += `<tr><td>Total Online Payments</td><td>${formatCurrency(onlinePaymentSum)}</td><td>-</td></tr>`;
+    html += `<tr style="font-weight:bold;"><td>Cash EXPECTED (Collection - Online - Expenses)</td><td>${formatCurrency(expectedCash)}</td><td>-</td></tr>`;
+    html += `<tr><td>Cash ACTUAL (Denomination Count)</td><td>${formatCurrency(actualCash)}</td><td>-</td></tr>`;
+    html += `<tr style="font-weight:bold; color:${Math.abs(balance) < 0.01 ? 'green' : 'red'};"><td>ACTUAL CASH BALANCE / DIFF</td><td>${formatCurrency(balance)}</td><td>-</td></tr>`;
+    html += `</tbody></table><hr style="border-color:#ccc; margin: 8px 0;">`;
+
+
+    // --- 2. Denomination Summary (Always visible, Page 1) ---
+    html += `<h4 style="margin: 10px 0; color: #8a2be2;">DENOMINATION BREAKDOWN (CASH ON HAND)</h4>`;
+    html += `<table style="font-size: 10px; width: 100%;">`;
+    html += `<thead><tr><th>Denom (₹)</th><th>Count</th><th>Total (₹)</th></tr></thead><tbody>`;
+    let denomHtml = '';
+    DENOMINATIONS.forEach(d => {
+        const count = denominationsSummary[d] || 0; 
+        const total = d * count;
+        denomHtml += `<tr><td>${d.toLocaleString('en-IN')}</td><td>${formatNumber(count)}</td><td>${formatCurrency(total)}</td></tr>`;
+    });
+    html += denomHtml;
+    html += `</tbody><tfoot><tr><td colspan="2" style="text-align:right; font-weight:bold;">GRAND CASH TOTAL</td><td>${formatCurrency(actualCash)}</td></tr></tfoot>`;
+    html += `</table><hr style="border-color:#ccc; margin: 8px 0;">`;
+
+    // --- 4. Expense List (Should follow Shop list) ---
+    html += `<h4 style="margin: 10px 0; color: #ff4500;">EXPENSES (Total: ₹${formatCurrency(totalExpenses)})</h4>`;
+    if (expenses.length > 0) {
+        html += `<table style="font-size: 10px; width: 100%;">`;
+        html += `<thead><tr><th>Description</th><th>Amount (₹)</th><th>Type</th></tr></thead><tbody>`;
+        expenses.forEach(exp => {
+            const amountColor = exp.type === 'Cash' ? 'red' : 'black';
+            html += `<tr>`;
+            html += `<td>${exp.desc}</td>`;
+            html += `<td style="color:${amountColor};">${formatCurrency(exp.amount)}</td>`;
+            html += `<td>${exp.type}</td>`;
+            html += `</tr>`;
+        });
+        html += `</tbody></table>`;
+    } else {
+        html += `<p style="font-size:10px; text-align:center;">No expenses recorded.</p>`;
+    }
+
+    // --- 5. Undelivered SKU List (Last section) ---
+    const returnQuantities = {};
+    dataRows.forEach(row => {
+        if (!shopStatus[row.shop]) {
+            returnQuantities[row.category] = (returnQuantities[row.category] || 0) + row.quantity;
+        }
+    });
+
+    const returnKeys = Object.keys(returnQuantities).sort();
+
+    html += `<h4 style="margin: 10px 0; color: #ff4500;">UNDELIVERED SKUS</h4>`;
+    if (returnKeys.length > 0) {
+        html += `<table style="font-size: 10px; width: 100%;">`;
+        html += `<thead><tr><th>SKU (Category)</th><th>Quantity</th></tr></thead><tbody>`;
+        returnKeys.forEach(k => {
+            html += `<tr><td>${k}</td><td>${formatNumber(returnQuantities[k])}</td></tr>`;
+        });
+        html += `</tbody></table>`;
+    } else {
+        html += `<p style="font-size:10px; text-align:center;">All SKUs are accounted for in delivered shops.</p>`;
+    }
+// --- 3. Shop & Payment Status (New Expandable Section) ---
+ const grouped = groupByShop(dataRows);
+ const shopNames = Object.keys(grouped).sort((a,b) => (shopStatus[a] ? 1 : 0) - (shopStatus[b] ? 1 : 0)); 
+ const pendingCount = shopNames.filter(name => !shopStatus[name]).length;
+
+ // Use <details> tag for native expandable behavior
+ html += `<details open style="margin-top: 20px; border: 1px solid #ddd; padding: 5px; background-color: #f9f9f9;">`;
+ html += `<summary style="font-weight: bold; color: #8a2be2; cursor: pointer; font-size: 12px;">`;
+ html += `SHOP & PAYMENT STATUS (${shopNames.length} Shops - ${pendingCount} Pending) - TAP TO EXPAND`;
+ html += `</summary>`;
+ 
+ html += `<table style="font-size: 10px; width: 100%; margin-top: 8px;">`;
+ html += `<thead><tr><th>Shop</th><th>Total (₹)</th><th>Status</th><th>Cash Recd (₹)</th><th>Online Paid (₹)</th></tr></thead><tbody>`;
+ 
+ shopNames.forEach(shop => {
+     const isDelivered = shopStatus[shop] || false;
+     const total = grouped[shop].totalCollection;
+     const payments = shopPayments[shop] || { cash: 0, online: 0 };
+     const statusColor = isDelivered ? 'green' : 'red';
+     const statusText = isDelivered ? 'DELIVERED' : 'PENDING';
+
+     html += `<tr>`;
+     html += `<td style="font-weight:bold;">${shop}</td>`;
+     html += `<td>${formatCurrency(total)}</td>`;
+     html += `<td style="color:${statusColor};">${statusText}</td>`;
+     html += `<td>${formatCurrency(payments.cash)}</td>`;
+     html += `<td>${formatCurrency(payments.online)}</td>`;
+     html += `</tr>`;
+ });
+
+ html += `</tbody></table>`;
+ html += `</details>`; // Close <details>
+ html += `<hr style="border-color:#ccc; margin: 8px 0;">`;
+
+
+    // --- Final Render ---
+    summaryDiv.innerHTML = html;
+}
+
+/* ---------- Post Update Clean Up ---------- */
+// Function to centralize UI updates after any data change
+async function postUpdateCleanUpAndNotify() {
+    renderTable(); // Updates shops table and return items
+    renderExpensesTable(); // Updates expenses table
+    renderDenominationSummary(); // Updates denom summary and cash amount
+    calculatePaymentBalance(); // Updates payment calculation and balance
+    renderOverallSummary(); // Updates the overall summary page
+    populateCategorySelect(); // Updates SKU dropdown
+}
+
+/* ---------- Data Form Submit (Sales Entry Page) ---------- */
+dataForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const shop = shopInput.value.trim();
+    let category = categorySelect.value;
+    
+    // Handle 'Enter New SKU' option
+    if (category === 'NEW_SKU_ENTRY') {
+        category = newCategoryInput.value.trim();
+        if (!category) {
+            alert('Please enter a name for the new SKU.');
+            return;
+        }
+    }
+
+    const quantity = parseInt(quantityInput.value, 10);
+    const amount = parseFloat(amountInput.value);
+
+    if (quantity <= 0 || amount < 0) {
+        alert('Quantity must be greater than 0 and Amount must be 0 or greater.');
+        return;
+    }
+
+    const newEntry = { shop, category, quantity, amount };
+
+    try {
+        if (editingIndex !== -1) {
+            // Update logic
+            newEntry.index = editingIndex;
+            await dbPut(STORE_DATA, newEntry);
+            const indexToUpdate = dataRows.findIndex(r => r.index === editingIndex);
+            if (indexToUpdate !== -1) {
+                dataRows[indexToUpdate] = newEntry;
+            }
+            editingIndex = -1;
+            document.getElementById('addBtn').innerHTML = '<b><font color="white">Add</font></b>';
+        } else {
+            const newIndex = await dbPut(STORE_DATA, newEntry);
+            dataRows.push({ ...newEntry, index: newIndex });
+        }
+
+        if (shopStatus[shop]) {
+            await removeShopDeliveryAndDenominations(shop);
+            alert(`Note: ${shop} was delivered. Updating its entry has reverted its status to Undelivered and removed its payment/denomination records. Please re-confirm delivery to update payment and denominations.`);
+        }
+
+        await postUpdateCleanUpAndNotify(); // NOW AWAITED
+
+        dataForm.reset();
+        categorySelect.value = '';
+        newCategoryInput.value = '';
+        newCategoryInput.style.display = 'none';
+        newCategoryInput.removeAttribute('required');
+
+    } catch (error) {
+        console.error("Error saving data entry:", error);
+        alert("An error occurred while saving the data.");
+    }
+});
+
+/* ---------- Clear All (Sales Entry Page) ---------- */
+document.getElementById('clearBtn').addEventListener('click', async () => {
+    if (!confirm('Are you sure you want to delete all entries, statuses, denominations and expenses? This is irreversible.')) return;
+
+    try {
+        await dbTransaction(STORE_DATA, 'readwrite', (store) => store.clear());
+        await dbTransaction(STORE_EXPENSES, 'readwrite', (store) => store.clear());
+        await dbTransaction(STORE_STATUS, 'readwrite', (store) => store.clear());
+        await dbTransaction(STORE_PAYMENTS, 'readwrite', (store) => store.clear());
+        await dbTransaction(STORE_DENOM_SUMMARY, 'readwrite', (store) => store.clear());
+        await dbTransaction(STORE_SHOP_DENOMS, 'readwrite', (store) => store.clear());
+        await dbTransaction(STORE_EXPENSE_DENOMS, 'readwrite', (store) => store.clear());
+
+        dataRows = [];
+        shopStatus={};
+        shopPayments={};
+        denominationsSummary={};
+        shopDenominations={};
+        expenses=[];
+        expenseDenominations={};
+        
+        DENOMINATIONS.forEach(d => denominationsSummary[d]=0);
+        for (const d of DENOMINATIONS) {
+             await dbPut(STORE_DENOM_SUMMARY, { denom: d, count: 0 });
+        }
+
+        renderExpensesTable();
+        await postUpdateCleanUpAndNotify(); // NOW AWAITED
+        
+        alert('All data has been cleared.');
+        changePage('sales'); // Go back to the sales entry page
+    } catch (error) {
+        console.error("Error clearing all data:", error);
+        alert("An error occurred while clearing all data.");
+    }
+});
+
+/* ---------- Category Select Listener ---------- */
+categorySelect.addEventListener('change', () => {
+    if (categorySelect.value === 'NEW_SKU_ENTRY') {
+        newCategoryInput.style.display = 'block';
+        newCategoryInput.setAttribute('required', 'required');
+    } else {
+        newCategoryInput.style.display = 'none';
+        newCategoryInput.removeAttribute('required');
+        newCategoryInput.value = '';
+    }
+});
+
+/* ---------- Edit Entry (Shop Details Page) - Includes revert delivery & denom ---------- */
+function editEntry(index) {
+    const entry = dataRows.find(r => r.index === index);
+    if (!entry) return;
+
+    shopInput.value = entry.shop;
+    const categoryValue = entry.category;
+    categorySelect.value = categoryValue;
+    newCategoryInput.value = '';
+    newCategoryInput.style.display = 'none';
+    newCategoryInput.removeAttribute('required');
+    
+    if (categorySelect.value !== categoryValue) {
+        categorySelect.value = 'NEW_SKU_ENTRY';
+        newCategoryInput.value = categoryValue;
+        newCategoryInput.style.display = 'block';
+        newCategoryInput.setAttribute('required', 'required');
+    }
+
+    quantityInput.value = entry.quantity;
+    amountInput.value = entry.amount.toFixed(2);
+    editingIndex = index;
+    document.getElementById('addBtn').innerHTML = '<b>Update</b>';
+
+    if (shopStatus[entry.shop]) {
+        alert(`Note: "${entry.shop}" was marked Delivered. Editing it will mark it Undelivered and remove associated denomination counts from the summary. After updating, re-confirm delivery.`);
+        removeShopDeliveryAndDenominations(entry.shop);
+        renderTable();
+    }
+    
+    changePage('sales');
+}
+
+/* ---------- Delete Entry (Shop Details Page) ---------- */
+async function deleteEntry(index) {
+    const indexToDelete = dataRows.findIndex(r => r.index === index);
+    if (indexToDelete === -1) return;
+    
+    const entry = dataRows[indexToDelete];
+    if (!confirm(`Are you sure you want to delete this entry: Shop: ${entry.shop}, SKU: ${entry.category}, Quantity: ${entry.quantity}?`)) return;
+
+    try {
+        const shopName = entry.shop;
+        const isDelivered = shopStatus[shopName];
+        
+        await dbDelete(STORE_DATA, index);
+        dataRows.splice(indexToDelete, 1);
+        
+        const remainingEntries = dataRows.filter(r => r.shop === shopName);
+
+        if (isDelivered && remainingEntries.length > 0) {
+            await removeShopDeliveryAndDenominations(shopName);
+            alert(`Note: ${shopName} was delivered. Deleting this entry has reverted its status to Undelivered and removed its payment/denomination records. Please re-confirm delivery if other entries for ${shopName} remain.`);
+        } else if (isDelivered && remainingEntries.length === 0) {
+             // If this was the last entry, remove all associated records entirely
+            await removeShopDeliveryAndDenominations(shopName);
+             alert(`Note: ${shopName} was delivered. This was the last entry, so its status and payment records have been entirely removed.`);
+        }
+        
+        await postUpdateCleanUpAndNotify(); // NOW AWAITED
+
+    } catch (error) {
+        console.error("Error deleting data entry:", error);
+        alert("An error occurred while deleting the data.");
+    }
+}
+
+/* ---------- VIEW STORAGE (Corrected) ---------- */
+function viewStorage() {
+  if (navigator.storage && navigator.storage.estimate) {
+    navigator.storage.estimate().then(({ quota, usage }) => {
+      const quotaGB = (quota / (1024 * 1024 * 1024)).toFixed(2);
+      const usageMB = (usage / (1024 * 1024)).toFixed(2);
+      
+      let content = `
+      <h4 style="text-align:left;">Storage Estimate (IndexedDB)</h4>
+      <p>Total Quota: ${quotaGB} GB</p>
+      <p>Current Usage: ${usageMB} MB</p>
+      <hr>
+      <p>The details on your sales, shops, and expenses are not shown here for brevity. They are stored securely in IndexedDB.</p>
+      `;
+
+      // Set the modal header
+      document.getElementById('modalShopName').textContent = "Storage & Database Information"; 
+      
+      // Toggle Sections: Hide Shop Total, Show Generic Content
+      document.getElementById('modalShopTotalSection').style.display = 'none';
+      const generic = document.getElementById('modalGenericSection');
+      generic.style.display = 'block';
+      generic.innerHTML = content;
+      
+      const modal = document.getElementById('customModal');
+      modal.style.display = 'block';
+
+    }).catch(e => {
+      alert("Could not retrieve storage estimate: " + e.message);
+    });
+  } else {
+    alert("Storage estimation is not supported in this browser.");
+  }
+}
+
+
+/* overlay click close behavior */
+window.onclick = function(event) {
+  if (event.target === paymentTypeModal) { cancelPaymentConfirmation(); }
+  if (event.target === document.getElementById('partialPaymentModal')) { 
+      if (currentShopForPayment && !shopStatus[currentShopForPayment]) {
+          const checkbox = document.querySelector(`input[onchange*="${currentShopForPayment}"]`);
+          if (checkbox) checkbox.checked = false;
+      }
+      closeModal('partialPaymentModal');
+      renderTable();
+  }
+  if (event.target === denomModal) { cancelDenomModal(); }
+  if (event.target === document.getElementById('customModal')) { closeModal('customModal'); }
+};
+
+/* ---------- Toggle Listener (re-added) ---------- */
+expander.addEventListener('click', () => {
+  expensesPanel.classList.toggle('hidden');
+});
+
+
+/* ---------- Initial Load ---------- */
+document.addEventListener('DOMContentLoaded', async () => {
+    loadDarkModePreference(); // Load dark mode preference immediately
+    try {
+        await openDatabase();
+        await loadAllData();
+        changePage('sales'); 
+    } catch (error) {
+        console.error("Initialization failed:", error);
+     
+    }
+});
+</script>
+</body>
+</html>
