@@ -9,21 +9,31 @@
     background: #f8f9fa;
     overflow: hidden;
   }
+  .header {
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    padding: 4px 0;
+    letter-spacing: 0.3px;
+    transition: background-color 0.4s ease;
+  }
   #banner {
     display: flex;
     align-items: center;
-    height: 60px;                 /* match your old AdMob height */
+    height: 56px;
     padding: 0 12px;
     background: white;
     border-top: 1px solid #e0e0e0;
     cursor: pointer;
   }
   #banner img {
-    width: 44px;
-    height: 44px;
+    width: 42px;
+    height: 42px;
     border-radius: 8px;
     object-fit: cover;
     margin-right: 12px;
+    flex-shrink: 0;
   }
   .text {
     flex: 1;
@@ -32,17 +42,26 @@
   .title {
     font-size: 14px;
     font-weight: 600;
-    color: #202124;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-bottom: 2px;
+  }
+  .subtitle-container {
+    overflow: hidden;
+    height: 16px;
+    position: relative;
   }
   .subtitle {
     font-size: 12px;
-    color: #5f6368;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    position: absolute;
+    /* ===== MARQUEE SPEED CONTROL ===== */
+    animation: marquee 12s linear infinite;   /* ← Change this number */
+  }
+  @keyframes marquee {
+    0%   { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
   }
   .cta {
     background: #1a73e8;
@@ -52,31 +71,47 @@
     padding: 6px 12px;
     border-radius: 16px;
     margin-left: 8px;
+    flex-shrink: 0;
   }
 </style>
 </head>
 <body>
+
+  <div class="header" id="header">Try Our Other Apps</div>
+
   <div id="banner">
     <img id="icon" src="" alt="">
     <div class="text">
       <div class="title" id="title">Loading...</div>
-      <div class="subtitle" id="subtitle"></div>
+      <div class="subtitle-container">
+        <div class="subtitle" id="subtitle"></div>
+      </div>
     </div>
     <div class="cta">Get</div>
   </div>
 
 <script>
-  const JSON_URL = "https://raw.githubusercontent.com/selvarajpannir-spec/onsite/refs/heads/main/banners.json"; // ← change this
+  const JSON_URL = "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/banners.json";
   let banners = [];
   let current = 0;
-  let rotateSeconds = 8;
+  let rotateSeconds = 16;
+
+  const colors = [
+    "#1a73e8", // blue
+    "#d93025", // red
+    "#188038", // green
+    "#f9ab00", // yellow
+    "#a142f4", // purple
+    "#e37400", // orange
+    "#007b83"  // teal
+  ];
 
   async function loadBanners() {
     try {
       const res = await fetch(JSON_URL + "?t=" + Date.now());
       const data = await res.json();
       banners = data.banners || [];
-      rotateSeconds = data.rotateSeconds || 8;
+      rotateSeconds = (data.rotateSeconds || 8) * 2;
       if (banners.length > 0) {
         showBanner(0);
         setInterval(() => {
@@ -86,21 +121,35 @@
       }
     } catch (e) {
       document.getElementById("title").innerText = "Our Apps";
-      document.getElementById("subtitle").innerText = "Tap to see more";
+      document.getElementById("subtitle").innerText = "Tap to explore more apps";
     }
   }
 
   function showBanner(index) {
     const b = banners[index];
+    const color = colors[index % colors.length];
+
+    // Change header background color
+    document.getElementById("header").style.backgroundColor = color;
+
     document.getElementById("icon").src = b.image;
     document.getElementById("title").innerText = b.title;
-    document.getElementById("subtitle").innerText = b.subtitle;
+    document.getElementById("title").style.color = color;
+
+    const subtitle = document.getElementById("subtitle");
+    subtitle.innerText = b.subtitle;
+    subtitle.style.color = color;
+
+    // Restart marquee
+    subtitle.style.animation = "none";
+    subtitle.offsetHeight;
+    subtitle.style.animation = "marquee 12s linear infinite";
+
     document.getElementById("banner").onclick = () => {
-      // Open Play Store
       if (window.Android && Android.openUrl) {
-        Android.openUrl(b.url);          // if you add JavascriptInterface
+        Android.openUrl(b.url);
       } else {
-        window.location.href = b.url;    // fallback
+        window.location.href = b.url;
       }
     };
   }
