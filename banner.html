@@ -31,9 +31,11 @@
     width: 42px;
     height: 42px;
     border-radius: 8px;
-    object-fit: cover;
+    object-fit: contain;          /* No crop + no stretch */
+    object-position: center;
     margin-right: 12px;
     flex-shrink: 0;
+    background: #f1f3f4;
   }
   .text {
     flex: 1;
@@ -56,8 +58,7 @@
     font-size: 12px;
     white-space: nowrap;
     position: absolute;
-    /* ===== MARQUEE SPEED CONTROL ===== */
-    animation: marquee 12s linear infinite;   /* ← Change this number */
+    animation: marquee 12s linear infinite;   /* Change this number to adjust speed */
   }
   @keyframes marquee {
     0%   { transform: translateX(100%); }
@@ -91,7 +92,7 @@
   </div>
 
 <script>
-  const JSON_URL = "https://raw.githubusercontent.com/selvarajpannir-spec/onsite/refs/heads/main/banners.json";
+  const JSON_URL = "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/banners.json"; // ← Change this
   let banners = [];
   let current = 0;
   let rotateSeconds = 16;
@@ -111,7 +112,7 @@
       const res = await fetch(JSON_URL + "?t=" + Date.now());
       const data = await res.json();
       banners = data.banners || [];
-      rotateSeconds = (data.rotateSeconds || 8) * 2;
+      rotateSeconds = (data.rotateSeconds || 8) * 2; // 2x slower
       if (banners.length > 0) {
         showBanner(0);
         setInterval(() => {
@@ -129,7 +130,7 @@
     const b = banners[index];
     const color = colors[index % colors.length];
 
-    // Change header background color
+    // Header color changes
     document.getElementById("header").style.backgroundColor = color;
 
     document.getElementById("icon").src = b.image;
@@ -140,7 +141,7 @@
     subtitle.innerText = b.subtitle;
     subtitle.style.color = color;
 
-    // Restart marquee
+    // Restart marquee animation
     subtitle.style.animation = "none";
     subtitle.offsetHeight;
     subtitle.style.animation = "marquee 12s linear infinite";
