@@ -1,0 +1,29 @@
+{
+  "rotateSeconds": 8,
+  "banners": [
+    {
+      "image": "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/banners/rider.png",
+      "title": "Rider+",
+      "subtitle": "Delivery management for independent gig workers",
+      "url": "https://play.google.com/store/apps/details?id=YOUR.PACKAGE.RIDER"
+    },
+    {
+      "image": "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/banners/inventory.png",
+      "title": "Inventory Manager+",
+      "subtitle": "Simple inventory app for SME",
+      "url": "https://play.google.com/store/apps/details?id=YOUR.PACKAGE.INVENTORY"
+    },
+    {
+      "image": "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/banners/docs-feature.png",
+      "title": "New in Docs+",
+      "subtitle": "Generate 50 documents at once from templates",
+      "url": "https://play.google.com/store/apps/details?id=YOUR.PACKAGE.DOCS"
+    },
+    {
+      "image": "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/banners/salary.png",
+      "title": "Salary+",
+      "subtitle": "Quick salary, overtime & allowance calculator",
+      "url": "https://play.google.com/store/apps/details?id=YOUR.PACKAGE.SALARY"
+    }
+  ]
+}
