@@ -31,7 +31,7 @@
     width: 42px;
     height: 42px;
     border-radius: 8px;
-    object-fit: contain;          /* No crop + no stretch */
+    object-fit: contain;
     object-position: center;
     margin-right: 12px;
     flex-shrink: 0;
@@ -58,7 +58,7 @@
     font-size: 12px;
     white-space: nowrap;
     position: absolute;
-    animation: marquee 12s linear infinite;   /* Change this number to adjust speed */
+    animation: marquee 12s linear infinite;
   }
   @keyframes marquee {
     0%   { transform: translateX(100%); }
@@ -92,37 +92,76 @@
   </div>
 
 <script>
-  const JSON_URL = "https://raw.githubusercontent.com/selvarajpannir-spec/onsite/refs/heads/main/banners.json"; // ← Change this
-  let banners = [];
-  let current = 0;
-  let rotateSeconds = 16;
-
-  const colors = [
-    "#1a73e8", // blue
-    "#d93025", // red
-    "#188038", // green
-    "#f9ab00", // yellow
-    "#a142f4", // purple
-    "#e37400", // orange
-    "#007b83"  // teal
+  // ============================================
+  //  EASY TO EXPAND - Just add more objects here
+  // ============================================
+  const defaultBanners = [
+    {
+      image: "https://cdn.jsdelivr.net/gh/YOUR_USERNAME/YOUR_REPO@main/images/rider.png",
+      title: "Rider+",
+      subtitle: "Delivery management for independent gig workers",
+      url: "https://play.google.com/store/apps/details?id=com.your.riderplus"
+    },
+    {
+      image: "https://cdn.jsdelivr.net/gh/YOUR_USERNAME/YOUR_REPO@main/images/inventory.png",
+      title: "Inventory Manager+",
+      subtitle: "Simple inventory app for SME",
+      url: "https://play.google.com/store/apps/details?id=com.your.inventory"
+    },
+    {
+      image: "https://cdn.jsdelivr.net/gh/YOUR_USERNAME/YOUR_REPO@main/images/lifting.png",
+      title: "Lifting+",
+      subtitle: "Lifting Plan Helper",
+      url: "https://play.google.com/store/apps/details?id=com.your.lifting"
+    },
+    {
+      image: "https://cdn.jsdelivr.net/gh/YOUR_USERNAME/YOUR_REPO@main/images/salary.png",
+      title: "Salary+",
+      subtitle: "Quick salary & allowance calculator",
+      url: "https://play.google.com/store/apps/details?id=com.your.salary"
+    },
+    {
+      image: "https://cdn.jsdelivr.net/gh/YOUR_USERNAME/YOUR_REPO@main/images/docs.png",
+      title: "Docs+",
+      subtitle: "Bulk document generator from templates",
+      url: "https://play.google.com/store/apps/details?id=com.your.docs"
+    }
+    // ← Add more apps here in the future
   ];
 
-  async function loadBanners() {
-    try {
-      const res = await fetch(JSON_URL + "?t=" + Date.now());
-      const data = await res.json();
-      banners = data.banners || [];
-      rotateSeconds = (data.rotateSeconds || 8) * 2; // 2x slower
-      if (banners.length > 0) {
-        showBanner(0);
-        setInterval(() => {
-          current = (current + 1) % banners.length;
-          showBanner(current);
-        }, rotateSeconds * 1000);
-      }
-    } catch (e) {
-      document.getElementById("title").innerText = "Our Apps";
-      document.getElementById("subtitle").innerText = "Tap to explore more apps";
+  const colors = [
+    "#1a73e8", "#d93025", "#188038", "#f9ab00",
+    "#a142f4", "#e37400", "#007b83"
+  ];
+
+  let banners = [];
+  let current = 0;
+  const rotateSeconds = 16; // 2x slower
+
+  // Load from cache or use default
+  function loadBanners() {
+    const cached = localStorage.getItem("house_banners");
+    
+    if (navigator.onLine) {
+      // Online → use latest list and update cache
+      banners = defaultBanners;
+      localStorage.setItem("house_banners", JSON.stringify(defaultBanners));
+      console.log("Loaded latest banners + updated cache");
+    } else if (cached) {
+      // Offline → use cache
+      banners = JSON.parse(cached);
+      console.log("Offline - loaded from cache");
+    } else {
+      // First time + offline
+      banners = defaultBanners;
+    }
+
+    if (banners.length > 0) {
+      showBanner(0);
+      setInterval(() => {
+        current = (current + 1) % banners.length;
+        showBanner(current);
+      }, rotateSeconds * 1000);
     }
   }
 
@@ -130,9 +169,7 @@
     const b = banners[index];
     const color = colors[index % colors.length];
 
-    // Header color changes
     document.getElementById("header").style.backgroundColor = color;
-
     document.getElementById("icon").src = b.image;
     document.getElementById("title").innerText = b.title;
     document.getElementById("title").style.color = color;
@@ -141,7 +178,7 @@
     subtitle.innerText = b.subtitle;
     subtitle.style.color = color;
 
-    // Restart marquee animation
+    // Restart marquee
     subtitle.style.animation = "none";
     subtitle.offsetHeight;
     subtitle.style.animation = "marquee 12s linear infinite";
@@ -154,6 +191,12 @@
       }
     };
   }
+
+  // Also listen for when internet comes back
+  window.addEventListener("online", () => {
+    console.log("Back online - refreshing banners");
+    loadBanners();
+  });
 
   loadBanners();
 </script>
