@@ -4,63 +4,99 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
+
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background: #f8f9fa;
     overflow: hidden;
   }
+
   .header {
     background: #1a73e8;
     color: white;
-    font-size: 12px;
+    font-size: clamp(11px, 2.8vw, 13px);
     font-weight: 600;
     text-align: center;
     padding: 5px 0;
     transition: background 0.4s;
   }
+
   #banner {
     display: flex;
     align-items: center;
-    height: 56px;
-    padding: 0 12px;
+    height: clamp(52px, 14vw, 64px);
+    padding: 0 clamp(8px, 3vw, 14px);
     background: white;
     border-top: 1px solid #e0e0e0;
   }
+
   #banner img {
-    width: 42px;
-    height: 42px;
+    width: clamp(36px, 10vw, 48px);
+    height: clamp(36px, 10vw, 48px);
     border-radius: 8px;
     object-fit: contain;
-    margin-right: 12px;
+    margin-right: clamp(8px, 2.5vw, 12px);
     background: #f1f3f4;
+    flex-shrink: 0;
   }
+
   .text {
     flex: 1;
     overflow: hidden;
+    min-width: 0;
   }
+
   .title {
-    font-size: 14px;
+    font-size: clamp(13px, 3.5vw, 15px);
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     margin-bottom: 2px;
   }
+
   .subtitle {
-    font-size: 12px;
+    font-size: clamp(11px, 3vw, 13px);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
   .cta {
     background: #1a73e8;
     color: white;
-    font-size: 12px;
+    font-size: clamp(11px, 3vw, 13px);
     font-weight: 500;
-    padding: 6px 12px;
+    padding: clamp(5px, 1.5vw, 7px) clamp(10px, 3vw, 14px);
     border-radius: 16px;
     text-decoration: none;
     flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  /* Extra adjustment for very small screens */
+  @media (max-width: 360px) {
+    #banner {
+      height: 50px;
+    }
+    .title {
+      font-size: 12.5px;
+    }
+    .subtitle {
+      font-size: 10.5px;
+    }
+  }
+
+  /* Better look on tablets and larger screens */
+  @media (min-width: 600px) {
+    #banner {
+      height: 62px;
+      padding: 0 16px;
+    }
+    #banner img {
+      width: 48px;
+      height: 48px;
+    }
   }
 </style>
 </head>
@@ -78,18 +114,15 @@
   </div>
 
 <script>
-  // ================================================
-  //  EASY TO ADD NEW APP - Just copy one full object
-  // ================================================
   const apps = [
     {
       title: "Rider+",
       image: "https://cdn.jsdelivr.net/gh/selvarajpannir-spec/onsite@main/images/rider.png",
       url: "https://play.google.com/store/apps/details?id=com.riderplus.app",
       sentences: [
-        "Made specially for parcel delivery workers",
-        "Manage all your deliveries in one simple app",
-        "Track earnings and daily performance easily",
+        "Useful for gig & parcel delivery workers",
+        "Manage all your deliveries in one app",
+        "Track earnings and daily performance",
         "Fast, lightweight and free to use"
       ]
     },
@@ -157,7 +190,6 @@
     document.getElementById("cta").style.background = color;
   }
 
-  // Change sentence every 5 seconds
   setInterval(() => {
     sentenceIndex++;
     if (sentenceIndex >= 4) {
@@ -167,7 +199,6 @@
     showContent();
   }, 5000);
 
-  // Show first content immediately
   showContent();
 </script>
 </body>
