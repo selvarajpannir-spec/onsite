@@ -58,7 +58,7 @@
     font-size: 12px;
     white-space: nowrap;
     position: absolute;
-    animation: marquee 20s linear infinite;
+    animation: marquee 30s linear infinite;
   }
   @keyframes marquee {
     0%   { transform: translateX(100%); }
@@ -137,7 +137,7 @@
 
   let banners = [];
   let current = 0;
-  const rotateSeconds = 16; // 2x slower
+  const rotateSeconds = 24; // 3x slower
 
   // Load from cache or use default
   function loadBanners() {
