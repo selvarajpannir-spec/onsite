@@ -58,7 +58,7 @@
     font-size: 12px;
     white-space: nowrap;
     position: absolute;
-    animation: marquee 20s linear infinite;
+    animation: marquee 30s linear infinite;
   }
   @keyframes marquee {
     0%   { transform: translateX(100%); }
@@ -137,7 +137,7 @@
 
   let banners = [];
   let current = 0;
-  const rotateSeconds = 20; // 6x slower
+  const rotateSeconds = 30; // 6x slower
 
   // Load from cache or use default
   function loadBanners() {
@@ -182,7 +182,7 @@
     // Restart marquee
     subtitle.style.animation = "none";
     subtitle.offsetHeight;
-    subtitle.style.animation = "marquee 20s linear infinite";
+    subtitle.style.animation = "marquee 30s linear infinite";
 
     document.getElementById("banner").onclick = () => {
       if (window.Android && Android.openUrl) {
