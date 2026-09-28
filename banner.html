@@ -22,22 +22,44 @@
   }
 
   #banner {
+    position: relative;
     display: flex;
     align-items: center;
-    height: clamp(52px, 14vw, 64px);
-    padding: 0 clamp(8px, 3vw, 14px);
-    background: white;
-    border-top: 1px solid #e0e0e0;
+    height: clamp(56px, 15vw, 70px);
+    padding: 0 14px;
+    overflow: hidden;
+    color: white;
   }
 
-  #banner img {
-    width: clamp(36px, 10vw, 48px);
-    height: clamp(36px, 10vw, 48px);
-    border-radius: 8px;
-    object-fit: contain;
-    margin-right: clamp(8px, 2.5vw, 12px);
-    background: #f1f3f4;
-    flex-shrink: 0;
+  /* Full background image - adjusted to fit */
+  #banner-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;          /* Fills the banner */
+    object-position: center;    /* Keeps important part centered */
+    z-index: 1;
+  }
+
+  /* Dark overlay for readable text */
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.58);
+    z-index: 2;
+  }
+
+  .content {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    width: 100%;
   }
 
   .text {
@@ -47,56 +69,32 @@
   }
 
   .title {
-    font-size: clamp(13px, 3.5vw, 15px);
+    font-size: clamp(14px, 3.8vw, 16px);
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-bottom: 2px;
+    margin-bottom: 3px;
   }
 
   .subtitle {
-    font-size: clamp(11px, 3vw, 13px);
+    font-size: clamp(12px, 3.2vw, 13.5px);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    opacity: 0.95;
   }
 
   .cta {
-    background: #1a73e8;
-    color: white;
+    background: #ffffff;
+    color: #1a73e8;
     font-size: clamp(11px, 3vw, 13px);
-    font-weight: 500;
-    padding: clamp(5px, 1.5vw, 7px) clamp(10px, 3vw, 14px);
-    border-radius: 16px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 20px;
     text-decoration: none;
     flex-shrink: 0;
-    white-space: nowrap;
-  }
-
-  /* Extra adjustment for very small screens */
-  @media (max-width: 360px) {
-    #banner {
-      height: 50px;
-    }
-    .title {
-      font-size: 12.5px;
-    }
-    .subtitle {
-      font-size: 10.5px;
-    }
-  }
-
-  /* Better look on tablets and larger screens */
-  @media (min-width: 600px) {
-    #banner {
-      height: 62px;
-      padding: 0 16px;
-    }
-    #banner img {
-      width: 48px;
-      height: 48px;
-    }
+    margin-left: 10px;
   }
 </style>
 </head>
@@ -105,12 +103,16 @@
   <div class="header" id="header">Try My Other Apps</div>
 
   <div id="banner">
-    <img id="icon" src="" alt="">
-    <div class="text">
-      <div class="title" id="title"></div>
-      <div class="subtitle" id="subtitle"></div>
+    <img id="banner-bg" src="" alt="">
+    <div class="overlay"></div>
+
+    <div class="content">
+      <div class="text">
+        <div class="title" id="title"></div>
+        <div class="subtitle" id="subtitle"></div>
+      </div>
+      <a class="cta" id="cta" href="#" target="_blank">Get</a>
     </div>
-    <a class="cta" id="cta" href="#" target="_blank">Get</a>
   </div>
 
 <script>
@@ -120,9 +122,9 @@
       image: "https://cdn.jsdelivr.net/gh/selvarajpannir-spec/onsite@main/images/rider.png",
       url: "https://play.google.com/store/apps/details?id=com.riderplus.app",
       sentences: [
-        "Useful for gig & parcel delivery workers",
-        "Manage all your deliveries in one app",
-        "Track earnings and daily performance",
+        "Made specially for gig & parcel delivery workers",
+        "Manage all your deliveries in one simple app",
+        "Track earnings and daily performance easily",
         "Fast, lightweight and free to use"
       ]
     },
@@ -181,13 +183,10 @@
     const color = colors[appIndex % colors.length];
 
     document.getElementById("header").style.background = color;
-    document.getElementById("icon").src = app.image;
+    document.getElementById("banner-bg").src = app.image;
     document.getElementById("title").innerText = app.title;
-    document.getElementById("title").style.color = color;
     document.getElementById("subtitle").innerText = app.sentences[sentenceIndex];
-    document.getElementById("subtitle").style.color = color;
     document.getElementById("cta").href = app.url;
-    document.getElementById("cta").style.background = color;
   }
 
   setInterval(() => {
@@ -202,4 +201,4 @@
   showContent();
 </script>
 </body>
-</html>
+ </html>
