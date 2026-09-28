@@ -16,27 +16,17 @@
     font-weight: 600;
     text-align: center;
     padding: 5px 0;
+    transition: background 0.4s;
   }
-  .slider {
-    position: relative;
-    height: 56px;
-    overflow: hidden;
-  }
-  .banner-item {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 56px;
+  #banner {
     display: flex;
     align-items: center;
+    height: 56px;
     padding: 0 12px;
     background: white;
     border-top: 1px solid #e0e0e0;
-    opacity: 0;
-    animation: fade 60s infinite;
   }
-  .banner-item img {
+  #banner img {
     width: 42px;
     height: 42px;
     border-radius: 8px;
@@ -51,14 +41,13 @@
   .title {
     font-size: 14px;
     font-weight: 600;
-    color: #1a73e8;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-bottom: 2px;
   }
   .subtitle {
     font-size: 12px;
-    color: #5f6368;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -71,81 +60,115 @@
     padding: 6px 12px;
     border-radius: 16px;
     text-decoration: none;
-  }
-
-  /* Each banner shows for 20 seconds */
-  .banner-item:nth-child(1) { animation-delay: 0s; }
-  .banner-item:nth-child(2) { animation-delay: 20s; }
-  .banner-item:nth-child(3) { animation-delay: 40s; }
-  .banner-item:nth-child(4) { animation-delay: 60s; }
-  .banner-item:nth-child(5) { animation-delay: 80s; }
-
-  @keyframes fade {
-    0% { opacity: 0; }
-    2% { opacity: 1; }
-    31% { opacity: 1; }
-    33% { opacity: 0; }
-    100% { opacity: 0; }
+    flex-shrink: 0;
   }
 </style>
 </head>
 <body>
 
-  <div class="header">Try My Other Apps</div>
+  <div class="header" id="header">Try My Other Apps</div>
 
-  <div class="slider">
-
-    <!-- APP 1 -->
-    <div class="banner-item">
-      <img src="https://cdn.jsdelivr.net/gh/selvarajpannir-spec/onsite@main/images/rider.png" alt="">
-      <div class="text">
-        <div class="title">Rider+</div>
-        <div class="subtitle">Delivery Management App for Parcel Delivery. Specially made for gig workers</div>
-      </div>
-      <a class="cta" href="https://play.google.com/store/apps/details?id=com.riderplus.app">Get</a>
+  <div id="banner">
+    <img id="icon" src="" alt="">
+    <div class="text">
+      <div class="title" id="title"></div>
+      <div class="subtitle" id="subtitle"></div>
     </div>
-
-    <!-- APP 2 -->
-    <div class="banner-item">
-      <img src="https://cdn.jsdelivr.net/gh/selvarajpannir-spec/onsite@main/images/iv-manager.png" alt="">
-      <div class="text">
-        <div class="title">Inventory Manager+</div>
-        <div class="subtitle">Mobile Ledger App To Manage Warehouse Goods Stocks and Movements</div>
-      </div>
-      <a class="cta" href="https://play.google.com/store/apps/details?id=com.inventorymanagerplus.app">Get</a>
-    </div>
-
-    <!-- APP 3 -->
-    <div class="banner-item">
-      <img src="https://cdn.jsdelivr.net/gh/selvarajpannir-spec/onsite@main/images/lifting.png" alt="">
-      <div class="text">
-        <div class="title">Lifting+</div>
-        <div class="subtitle">Lifting Plan Helper App To Find Angle and Distance With Trigonometry Formulas</div>
-      </div>
-      <a class="cta" href="https://play.google.com/store/apps/details?id=com.lifting.plus">Get</a>
-    </div>
-
-    <!-- APP 4 -->
-    <div class="banner-item">
-      <img src="https://cdn.jsdelivr.net/gh/selvarajpannir-spec/onsite@main/images/salary.png" alt="">
-      <div class="text">
-        <div class="title">Salary+</div>
-        <div class="subtitle">Time Card Management App With Salary, Overtime & Allowance Calculation</div>
-      </div>
-      <a class="cta" href="https://play.google.com/store/apps/details?id=com.salaryplus.app">Get</a>
-    </div>
-
-    <!-- APP 5 -->
-    <div class="banner-item">
-      <img src="https://cdn.jsdelivr.net/gh/selvarajpannir-spec/onsite@main/images/docs+.png" alt="">
-      <div class="text">
-        <div class="title">Docs+</div>
-        <div class="subtitle">Bulk document duplicator App to Generate 50 documents in 60 seconds</div>
-      </div>
-      <a class="cta" href="https://play.google.com/store/apps/details?id=com.docs.plus">Get</a>
-    </div>
-
+    <a class="cta" id="cta" href="#" target="_blank">Get</a>
   </div>
 
+<script>
+  // ================================================
+  //  EASY TO ADD NEW APP - Just copy one full object
+  // ================================================
+  const apps = [
+    {
+      title: "Rider+",
+      image: "https://cdn.jsdelivr.net/gh/selvarajpannir-spec/onsite@main/images/rider.png",
+      url: "https://play.google.com/store/apps/details?id=com.riderplus.app",
+      sentences: [
+        "Made specially for gig & parcel delivery workers",
+        "Manage all your deliveries in one simple app",
+        "Track earnings and daily performance easily",
+        "Fast, lightweight and free to use"
+      ]
+    },
+    {
+      title: "Inventory Manager+",
+      image: "https://cdn.jsdelivr.net/gh/selvarajpannir-spec/onsite@main/images/iv-manager.png",
+      url: "https://play.google.com/store/apps/details?id=com.inventorymanagerplus.app",
+      sentences: [
+        "Simple mobile ledger for warehouse stocks",
+        "Track goods movement in and out easily",
+        "Low stock alerts help you stay prepared",
+        "Perfect for small companies and SMEs"
+      ]
+    },
+    {
+      title: "Lifting+",
+      image: "https://cdn.jsdelivr.net/gh/selvarajpannir-spec/onsite@main/images/lifting.png",
+      url: "https://play.google.com/store/apps/details?id=com.lifting.plus",
+      sentences: [
+        "Quickly calculate lifting angle & distance",
+        "Find material weight with simple formulas",
+        "Helpful for crane and lifting operations",
+        "Save time on site with instant results"
+      ]
+    },
+    {
+      title: "Salary+",
+      image: "https://cdn.jsdelivr.net/gh/selvarajpannir-spec/onsite@main/images/salary.png",
+      url: "https://play.google.com/store/apps/details?id=com.salaryplus.app",
+      sentences: [
+        "Time card management made simple",
+        "Calculate salary, overtime & allowances",
+        "Designed for daily wage workers",
+        "Fast and accurate every time"
+      ]
+    },
+    {
+      title: "Docs+",
+      image: "https://cdn.jsdelivr.net/gh/selvarajpannir-spec/onsite@main/images/docs+.png",
+      url: "https://play.google.com/store/apps/details?id=com.docs.plus",
+      sentences: [
+        "Generate 50 documents in under a minute",
+        "Create salary invoices & certificates easily",
+        "Works with your existing templates",
+        "Save hours of repetitive work"
+      ]
+    }
+  ];
+
+  const colors = ["#1a73e8", "#d93025", "#188038", "#f9ab00", "#a142f4"];
+  let appIndex = 0;
+  let sentenceIndex = 0;
+
+  function showContent() {
+    const app = apps[appIndex];
+    const color = colors[appIndex % colors.length];
+
+    document.getElementById("header").style.background = color;
+    document.getElementById("icon").src = app.image;
+    document.getElementById("title").innerText = app.title;
+    document.getElementById("title").style.color = color;
+    document.getElementById("subtitle").innerText = app.sentences[sentenceIndex];
+    document.getElementById("subtitle").style.color = color;
+    document.getElementById("cta").href = app.url;
+    document.getElementById("cta").style.background = color;
+  }
+
+  // Change sentence every 5 seconds
+  setInterval(() => {
+    sentenceIndex++;
+    if (sentenceIndex >= 4) {
+      sentenceIndex = 0;
+      appIndex = (appIndex + 1) % apps.length;
+    }
+    showContent();
+  }, 5000);
+
+  // Show first content immediately
+  showContent();
+</script>
 </body>
-         </html>
+</html>
