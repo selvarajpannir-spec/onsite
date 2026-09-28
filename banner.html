@@ -10,31 +10,38 @@
     overflow: hidden;
   }
   .header {
+    background: #1a73e8;
     color: white;
     font-size: 12px;
     font-weight: 600;
     text-align: center;
-    padding: 4px 0;
-    letter-spacing: 0.3px;
-    transition: background-color 0.4s ease;
+    padding: 5px 0;
   }
-  #banner {
+  .slider {
+    position: relative;
+    height: 56px;
+    overflow: hidden;
+  }
+  .banner-item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 56px;
     display: flex;
     align-items: center;
-    height: 56px;
     padding: 0 12px;
     background: white;
     border-top: 1px solid #e0e0e0;
-    cursor: pointer;
+    opacity: 0;
+    animation: fade 60s infinite;
   }
-  #banner img {
+  .banner-item img {
     width: 42px;
     height: 42px;
     border-radius: 8px;
     object-fit: contain;
-    object-position: center;
     margin-right: 12px;
-    flex-shrink: 0;
     background: #f1f3f4;
   }
   .text {
@@ -44,25 +51,17 @@
   .title {
     font-size: 14px;
     font-weight: 600;
+    color: #1a73e8;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-bottom: 2px;
-  }
-  .subtitle-container {
-    overflow: hidden;
-    height: 16px;
-    position: relative;
   }
   .subtitle {
     font-size: 12px;
+    color: #5f6368;
     white-space: nowrap;
-    position: absolute;
-    animation: marquee 30s linear infinite;
-  }
-  @keyframes marquee {
-    0%   { transform: translateX(100%); }
-    100% { transform: translateX(-100%); }
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .cta {
     background: #1a73e8;
@@ -71,135 +70,82 @@
     font-weight: 500;
     padding: 6px 12px;
     border-radius: 16px;
-    margin-left: 8px;
-    flex-shrink: 0;
+    text-decoration: none;
+  }
+
+  /* Each banner shows for 20 seconds */
+  .banner-item:nth-child(1) { animation-delay: 0s; }
+  .banner-item:nth-child(2) { animation-delay: 20s; }
+  .banner-item:nth-child(3) { animation-delay: 40s; }
+  .banner-item:nth-child(4) { animation-delay: 60s; }
+  .banner-item:nth-child(5) { animation-delay: 80s; }
+
+  @keyframes fade {
+    0% { opacity: 0; }
+    2% { opacity: 1; }
+    31% { opacity: 1; }
+    33% { opacity: 0; }
+    100% { opacity: 0; }
   }
 </style>
 </head>
 <body>
 
-  <div class="header" id="header">Try My Other Apps</div>
+  <div class="header">Try My Other Apps</div>
 
-  <div id="banner">
-    <img id="icon" src="" alt="">
-    <div class="text">
-      <div class="title" id="title">Loading...</div>
-      <div class="subtitle-container">
-        <div class="subtitle" id="subtitle"></div>
+  <div class="slider">
+
+    <!-- APP 1 -->
+    <div class="banner-item">
+      <img src="https://cdn.jsdelivr.net/gh/selvarajpannir-spec/onsite@main/images/rider.png" alt="">
+      <div class="text">
+        <div class="title">Rider+</div>
+        <div class="subtitle">Delivery Management App for Parcel Delivery. Specially made for gig workers</div>
       </div>
+      <a class="cta" href="https://play.google.com/store/apps/details?id=com.riderplus.app">Get</a>
     </div>
-    <div class="cta">Get</div>
+
+    <!-- APP 2 -->
+    <div class="banner-item">
+      <img src="https://cdn.jsdelivr.net/gh/selvarajpannir-spec/onsite@main/images/iv-manager.png" alt="">
+      <div class="text">
+        <div class="title">Inventory Manager+</div>
+        <div class="subtitle">Mobile Ledger App To Manage Warehouse Goods Stocks and Movements</div>
+      </div>
+      <a class="cta" href="https://play.google.com/store/apps/details?id=com.inventorymanagerplus.app">Get</a>
+    </div>
+
+    <!-- APP 3 -->
+    <div class="banner-item">
+      <img src="https://cdn.jsdelivr.net/gh/selvarajpannir-spec/onsite@main/images/lifting.png" alt="">
+      <div class="text">
+        <div class="title">Lifting+</div>
+        <div class="subtitle">Lifting Plan Helper App To Find Angle and Distance With Trigonometry Formulas</div>
+      </div>
+      <a class="cta" href="https://play.google.com/store/apps/details?id=com.lifting.plus">Get</a>
+    </div>
+
+    <!-- APP 4 -->
+    <div class="banner-item">
+      <img src="https://cdn.jsdelivr.net/gh/selvarajpannir-spec/onsite@main/images/salary.png" alt="">
+      <div class="text">
+        <div class="title">Salary+</div>
+        <div class="subtitle">Time Card Management App With Salary, Overtime & Allowance Calculation</div>
+      </div>
+      <a class="cta" href="https://play.google.com/store/apps/details?id=com.salaryplus.app">Get</a>
+    </div>
+
+    <!-- APP 5 -->
+    <div class="banner-item">
+      <img src="https://cdn.jsdelivr.net/gh/selvarajpannir-spec/onsite@main/images/docs+.png" alt="">
+      <div class="text">
+        <div class="title">Docs+</div>
+        <div class="subtitle">Bulk document duplicator App to Generate 50 documents in 60 seconds</div>
+      </div>
+      <a class="cta" href="https://play.google.com/store/apps/details?id=com.docs.plus">Get</a>
+    </div>
+
   </div>
 
-<script>
-  // ============================================
-  //  EASY TO EXPAND - Just add more objects here
-  // ============================================
-  const defaultBanners = [
-    {
-      image: "https://cdn.jsdelivr.net/gh/selvarajpannir-spec/onsite/images/rider.png",
-      title: "Rider+",
-      subtitle: "Delivery Management App for Parcel Delivery. Specially made for gig workers",
-      url: "https://play.google.com/store/apps/details?id=com.riderplus.app"
-    },
-    {
-     
-      image: "https://cdn.jsdelivr.net/gh/selvarajpannir-spec/onsite/images/iv-manager.png",
-      title: "Inventory Manager+",
-      subtitle: "Mobile Ledger App To Manage Warehouse Goods Stocks and Movements",
-      url: "https://play.google.com/store/apps/details?id=com.inventorymanagerplus.app"
-    },
-    {
-      image: "https://cdn.jsdelivr.net/gh/selvarajpannir-spec/onsite/images/lifting.png",
-      title: "Lifting+",
-      subtitle: "Lifting Plan Helper App To Find Angle and Distance With Trigonometry Formulas And Find Weight of Materials",
-      url: "https://play.google.com/store/apps/details?id=com.lifting.plus"
-    },
-    {
-      image: "https://cdn.jsdelivr.net/gh/selvarajpannir-spec/onsite/images/salary.png",
-      title: "Salary+",
-      subtitle: "Time Card Management App With Salary,Overtime & Allowance Calculation. Specially Made for Daily Wage workers",
-      url: "https://play.google.com/store/apps/details?id=com.salaryplus.app"
-    },
-    {
-      image: "https://cdn.jsdelivr.net/gh/selvarajpannir-spec/onsite/images/docs+.png",
-      title: "Docs+",
-      subtitle: "Bulk document duplicator App to Generate 50 documents in 60 sceonds (salary invoice, ID card, Invitation Letter, etc..."),
-      url: "https://play.google.com/store/apps/details?id=com.docs.plus"
-    }
-    // ← Add more apps here in the future
-  ];
-
-  const colors = [
-    "#1a73e8", "#d93025", "#188038", "#f9ab00",
-    "#a142f4", "#e37400", "#007b83"
-  ];
-
-  let banners = [];
-  let current = 0;
-  const rotateSeconds = 30; // 6x slower
-
-  // Load from cache or use default
-  function loadBanners() {
-    const cached = localStorage.getItem("house_banners");
-    
-    if (navigator.onLine) {
-      // Online → use latest list and update cache
-      banners = defaultBanners;
-      localStorage.setItem("house_banners", JSON.stringify(defaultBanners));
-      console.log("Loaded latest banners + updated cache");
-    } else if (cached) {
-      // Offline → use cache
-      banners = JSON.parse(cached);
-      console.log("Offline - loaded from cache");
-    } else {
-      // First time + offline
-      banners = defaultBanners;
-    }
-
-    if (banners.length > 0) {
-      showBanner(0);
-      setInterval(() => {
-        current = (current + 1) % banners.length;
-        showBanner(current);
-      }, rotateSeconds * 1000);
-    }
-  }
-
-  function showBanner(index) {
-    const b = banners[index];
-    const color = colors[index % colors.length];
-
-    document.getElementById("header").style.backgroundColor = color;
-    document.getElementById("icon").src = b.image;
-    document.getElementById("title").innerText = b.title;
-    document.getElementById("title").style.color = color;
-
-    const subtitle = document.getElementById("subtitle");
-    subtitle.innerText = b.subtitle;
-    subtitle.style.color = color;
-
-    // Restart marquee
-    subtitle.style.animation = "none";
-    subtitle.offsetHeight;
-    subtitle.style.animation = "marquee 30s linear infinite";
-
-    document.getElementById("banner").onclick = () => {
-      if (window.Android && Android.openUrl) {
-        Android.openUrl(b.url);
-      } else {
-        window.location.href = b.url;
-      }
-    };
-  }
-
-  // Also listen for when internet comes back
-  window.addEventListener("online", () => {
-    console.log("Back online - refreshing banners");
-    loadBanners();
-  });
-
-  loadBanners();
-</script>
 </body>
-</html>
+         </html>
