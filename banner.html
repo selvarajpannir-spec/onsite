@@ -31,27 +31,15 @@
     color: white;
   }
 
-  /* Full background image - adjusted to fit */
+  /* Full background image without shadow/glow */
   #banner-bg {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;          /* Fills the banner */
-    object-position: center;    /* Keeps important part centered */
+    object-fit: fill;
     z-index: 1;
-  }
-
-  /* Dark overlay for readable text */
-  .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.58);
-    z-index: 2;
   }
 
   .content {
@@ -68,21 +56,43 @@
     min-width: 0;
   }
 
+  /* Title text glow effect */
   .title {
+    display: inline;
+    color: #000000;
     font-size: clamp(14px, 3.8vw, 16px);
-    font-weight: 600;
+    font-weight: 800;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-bottom: 3px;
+    text-shadow: 
+      0 0 3px #ffff00,
+      0 0 8px #ffff00,
+      0 0 15px #ffff00,
+      0 0 25px #ffff00;
   }
 
+  /* Subtitle text glow effect */
   .subtitle {
+    display: inline;
+    color: #000000;
     font-size: clamp(12px, 3.2vw, 13.5px);
+    font-weight: 700;
+    white-space: nowrap;
+    text-shadow: 
+      0 0 3px #ffff00,
+      0 0 8px #ffff00,
+      0 0 15px #ffff00,
+      0 0 22px #ffff00;
+  }
+
+  .title-wrapper, .subtitle-wrapper {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    opacity: 0.95;
+  }
+
+  .title-wrapper {
+    text-align: center;
+    margin-bottom: 3px;
   }
 
   .cta {
@@ -95,6 +105,7 @@
     text-decoration: none;
     flex-shrink: 0;
     margin-left: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
   }
 </style>
 </head>
@@ -104,12 +115,11 @@
 
   <div id="banner">
     <img id="banner-bg" src="" alt="">
-    <div class="overlay"></div>
 
     <div class="content">
       <div class="text">
-        <div class="title" id="title"></div>
-        <div class="subtitle" id="subtitle"></div>
+        <div class="title-wrapper"><span class="title" id="title"></span></div>
+        <div class="subtitle-wrapper"><span class="subtitle" id="subtitle"></span></div>
       </div>
       <a class="cta" id="cta" href="#" target="_blank">Get</a>
     </div>
@@ -202,3 +212,4 @@
 </script>
 </body>
  </html>
+ 
